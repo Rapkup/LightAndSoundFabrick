@@ -1,5 +1,5 @@
 ﻿namespace SemataryFabrick.Domain.Entities.Enums;
-public enum PaymentState
+public enum PaymentStatus
 {
     Unpaid,
     PaymentConfirmation,

@@ -4,4 +4,6 @@ public class ItemInventory
 {
     public Guid Id { get; set; }
     public int Quantity { get; set; }
+
+    public IEnumerable<Item> Items { get; set; }
 }
