@@ -1,5 +1,5 @@
 ﻿namespace SemataryFabrick.Domain.Entities.Enums;
-public enum ProductStatus
+public enum ProductState
 {
     Available,
     InRepair,

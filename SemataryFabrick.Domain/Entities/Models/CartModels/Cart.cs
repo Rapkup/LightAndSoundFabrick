@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.Customers;
+﻿using SemataryFabrick.Domain.Entities.Models.UserModels;
 
 namespace SemataryFabrick.Domain.Entities.Models.CartModels;
 
@@ -8,6 +8,6 @@ public class Cart
     public decimal TotalPrice { get; set; }
     public Guid CustomerId { get; set; }
 
-    public Customer Customer { get; set; }
+    public ApplicationUser Customer { get; set; }
     public IEnumerable<CartItem> Items { get; set; }
 }
