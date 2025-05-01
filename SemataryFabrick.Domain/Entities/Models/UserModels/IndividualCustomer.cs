@@ -1,5 +1,4 @@
 ﻿using SemataryFabrick.Domain.Entities.Models.Order.Order;
-using SemataryFabrick.Domain.Entities.Models.Users;
 
 namespace SemataryFabrick.Domain.Entities.Models.UserModels;
 public class IndividualCustomer : ApplicationUser

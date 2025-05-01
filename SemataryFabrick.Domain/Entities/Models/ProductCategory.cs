@@ -5,5 +5,5 @@ public class ProductCategory
     public string Name { get; set; }
     public string Description { get; set; }
 
-    IEnumerable<SubCategory> SubCategories { get; set; }
+    public IEnumerable<SubCategory> SubCategories { get; set; }
 }

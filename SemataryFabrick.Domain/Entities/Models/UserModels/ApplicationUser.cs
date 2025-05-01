@@ -1,7 +1,7 @@
 ﻿using SemataryFabrick.Domain.Entities.Enums;
 
-namespace SemataryFabrick.Domain.Entities.Models.Users;
-public class ApplicationUser
+namespace SemataryFabrick.Domain.Entities.Models.UserModels;
+public abstract class ApplicationUser
 {
     public Guid Id { get; set; }
     public UserType UserType { get; set; }

@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.Users;
+﻿using SemataryFabrick.Domain.Entities.Models.UserModels;
 
 namespace SemataryFabrick.Domain.Entities.Models.CartModels;
 
