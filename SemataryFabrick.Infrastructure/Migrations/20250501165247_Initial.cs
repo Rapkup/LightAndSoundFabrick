@@ -15,7 +15,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 .Annotation("Npgsql:Enum:order_type", "rent,individual")
                 .Annotation("Npgsql:Enum:payment_status", "unpaid,payment_confirmation,paid")
                 .Annotation("Npgsql:Enum:product_state", "available,in_repair,out_of_stock")
-                .Annotation("Npgsql:Enum:user_type", "individual_customer,legal_customer,director,order_manager,worker,tech_order_lead")
+                .Annotation("Npgsql:Enum:user_type", "guest,individual_customer,legal_customer,director,order_manager,worker,tech_order_lead")
                 .Annotation("Npgsql:Enum:work_task_state", "in_progress,completed,assigned,not_assigned");
 
             migrationBuilder.CreateTable(
