@@ -23,7 +23,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_type", new[] { "rent", "individual" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "payment_status", new[] { "unpaid", "payment_confirmation", "paid" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "product_state", new[] { "available", "in_repair", "out_of_stock" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_type", new[] { "individual_customer", "legal_customer", "director", "order_manager", "worker", "tech_order_lead" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_type", new[] { "guest", "individual_customer", "legal_customer", "director", "order_manager", "worker", "tech_order_lead" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "work_task_state", new[] { "in_progress", "completed", "assigned", "not_assigned" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -161,7 +161,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Order.Order.OrderBase", b =>
+            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -214,30 +214,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Order.OrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("OrderBaseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderBaseId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItems");
-                });
-
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderCrew", b =>
                 {
                     b.Property<Guid>("Id")
@@ -260,6 +236,30 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.HasIndex("TechLeadId");
 
                     b.ToTable("OrderCrews");
+                });
+
+            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrderBaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderBaseId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.ProductCategory", b =>
@@ -387,7 +387,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 {
                     b.HasBaseType("SemataryFabrick.Domain.Entities.Models.UserModels.ApplicationUser");
 
-                    b.HasDiscriminator().HasValue(2);
+                    b.HasDiscriminator().HasValue(3);
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.IndividualCustomer", b =>
@@ -399,7 +399,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.HasDiscriminator().HasValue(0);
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.LegalCustomer", b =>
@@ -428,28 +428,28 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Property<bool?>("isGovernment")
                         .HasColumnType("boolean");
 
-                    b.HasDiscriminator().HasValue(1);
+                    b.HasDiscriminator().HasValue(2);
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.OrderManager", b =>
                 {
                     b.HasBaseType("SemataryFabrick.Domain.Entities.Models.UserModels.ApplicationUser");
 
-                    b.HasDiscriminator().HasValue(3);
+                    b.HasDiscriminator().HasValue(4);
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.TechOrderLead", b =>
                 {
                     b.HasBaseType("SemataryFabrick.Domain.Entities.Models.UserModels.ApplicationUser");
 
-                    b.HasDiscriminator().HasValue(5);
+                    b.HasDiscriminator().HasValue(6);
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.Worker", b =>
                 {
                     b.HasBaseType("SemataryFabrick.Domain.Entities.Models.UserModels.ApplicationUser");
 
-                    b.HasDiscriminator().HasValue(4);
+                    b.HasDiscriminator().HasValue(5);
                 });
 
             modelBuilder.Entity("OrderCrewWorker", b =>
@@ -522,7 +522,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Navigation("SubCategory");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Order.Order.OrderBase", b =>
+            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", b =>
                 {
                     b.HasOne("SemataryFabrick.Domain.Entities.Models.UserModels.LegalCustomer", "Customer")
                         .WithMany("OrderBases")
@@ -553,28 +553,9 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Navigation("TechOrderLead");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Order.OrderItem", b =>
-                {
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Order.Order.OrderBase", "OrderBase")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderBaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Items.Item", "Product")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("OrderBase");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderCrew", b =>
                 {
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Order.Order.OrderBase", "OrderBase")
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", "OrderBase")
                         .WithMany("OrderCrews")
                         .HasForeignKey("OrderBaseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -589,6 +570,25 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Navigation("OrderBase");
 
                     b.Navigation("TechOrderLead");
+                });
+
+            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderItem", b =>
+                {
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", "OrderBase")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderBaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Items.Item", "Product")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderBase");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.SubCategory", b =>
@@ -643,7 +643,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Order.Order.OrderBase", b =>
+            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", b =>
                 {
                     b.Navigation("OrderCrews");
 

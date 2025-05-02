@@ -1,5 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.Order.Order;
-using SemataryFabrick.Domain.Entities.Models.UserModels;
+﻿using SemataryFabrick.Domain.Entities.Models.UserModels;
 
 namespace SemataryFabrick.Domain.Entities.Models.OrderModels;
 public class OrderCrew

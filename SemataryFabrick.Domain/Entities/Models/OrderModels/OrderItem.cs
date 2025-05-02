@@ -1,7 +1,6 @@
 ﻿using SemataryFabrick.Domain.Entities.Models.Items;
-using SemataryFabrick.Domain.Entities.Models.Order.Order;
 
-namespace SemataryFabrick.Domain.Entities.Models.Order;
+namespace SemataryFabrick.Domain.Entities.Models.OrderModels;
 public class OrderItem
 {
     public Guid Id { get; set; }

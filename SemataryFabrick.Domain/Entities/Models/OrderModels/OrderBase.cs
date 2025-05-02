@@ -1,8 +1,7 @@
 ﻿using SemataryFabrick.Domain.Entities.Enums;
-using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 
-namespace SemataryFabrick.Domain.Entities.Models.Order.Order;
+namespace SemataryFabrick.Domain.Entities.Models.OrderModels;
 public class OrderBase
 {
     public Guid Id { get; set; }

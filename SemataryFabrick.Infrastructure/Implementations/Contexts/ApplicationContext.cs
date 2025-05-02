@@ -1,12 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
-using SemataryFabrick.Domain.Entities.Models.Items;
-using SemataryFabrick.Domain.Entities.Models.Order.Order;
-using SemataryFabrick.Domain.Entities.Models.Order;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 using SemataryFabrick.Domain.Entities.Models;
+using SemataryFabrick.Domain.Entities.Models.Items;
 
 namespace SemataryFabrick.Infrastructure.Implementations.Contexts;
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
@@ -34,6 +32,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         modelBuilder.HasPostgresEnum<ProductState>();
         modelBuilder.HasPostgresEnum<UserType>();
         modelBuilder.HasPostgresEnum<WorkTaskState>();
+
         modelBuilder.Entity<Cart>(e =>
        {
            e.HasKey(c => c.Id);
