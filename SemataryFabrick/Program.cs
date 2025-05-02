@@ -1,4 +1,5 @@
 using SemataryFabrick.Infrastructure.Extensions;
+using SemataryFabrick.Server.Middleware.CustomExceptionHandle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ await builder.Services.AddInfrastructureAsync(builder.Configuration);
 var app = builder.Build();
 
 app.UseCors("CorsPolicy");
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
