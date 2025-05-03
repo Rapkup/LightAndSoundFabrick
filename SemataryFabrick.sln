@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemataryFabrick.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemataryFabrick.Domain", "SemataryFabrick.Domain\SemataryFabrick.Domain.csproj", "{C46CC449-6098-455E-883D-94DECCFEBFFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemataryFabrick.Persistance", "SemataryFabrick.Persistance\SemataryFabrick.Persistance.csproj", "{6CB1FF46-5B27-45AD-A244-FC8F824BC82B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemataryFabrick.Application", "SemataryFabrick.Application\SemataryFabrick.Application.csproj", "{5B51F137-60D4-49DE-AF55-B27AD3CA9CD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemataryFabrikUI", "SemataryFabrikUI\SemataryFabrikUI.csproj", "{21CDDAFB-FEDC-4C04-BD44-9DFC1997144B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +35,14 @@ Global
 		{C46CC449-6098-455E-883D-94DECCFEBFFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C46CC449-6098-455E-883D-94DECCFEBFFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C46CC449-6098-455E-883D-94DECCFEBFFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6CB1FF46-5B27-45AD-A244-FC8F824BC82B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CB1FF46-5B27-45AD-A244-FC8F824BC82B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CB1FF46-5B27-45AD-A244-FC8F824BC82B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CB1FF46-5B27-45AD-A244-FC8F824BC82B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5B51F137-60D4-49DE-AF55-B27AD3CA9CD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5B51F137-60D4-49DE-AF55-B27AD3CA9CD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B51F137-60D4-49DE-AF55-B27AD3CA9CD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B51F137-60D4-49DE-AF55-B27AD3CA9CD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21CDDAFB-FEDC-4C04-BD44-9DFC1997144B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21CDDAFB-FEDC-4C04-BD44-9DFC1997144B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21CDDAFB-FEDC-4C04-BD44-9DFC1997144B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21CDDAFB-FEDC-4C04-BD44-9DFC1997144B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
