@@ -1,19 +1,25 @@
+using SemataryFabrick.Application.Extensions;
+using SemataryFabrick.Infrastructure.Extensions;
+using SemataryFabrickUI.Middleware.CustomExceptionHandle;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
+
+await builder.Services.AddInfrastructureAsync(builder.Configuration);
+await builder.Services.AddApplicationLayerAsync(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseRouting();
 

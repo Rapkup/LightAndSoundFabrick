@@ -7,7 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SemataryFabrick.Application\SemataryFabrick.Application.csproj" />
     <ProjectReference Include="..\SemataryFabrick.Domain\SemataryFabrick.Domain.csproj" />
+    <ProjectReference Include="..\SemataryFabrick.Infrastructure\SemataryFabrick.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
