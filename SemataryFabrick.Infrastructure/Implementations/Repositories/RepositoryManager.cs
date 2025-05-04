@@ -43,7 +43,7 @@ public class RepositoryManager : IRepositoryManager
         _individualCustomerRepository = new Lazy<IIndividualCustomerRepository>(() => new IndividualCustomerRepository(_context));
         _legalCustomerRepository = new Lazy<ILegalCustomerRepository>(() => new LegalCustomerRepository(_context));
         _orderManagerRepository = new Lazy<IOrderManagerRepository>(() => new OrderManagerRepository(_context));
-        _techOrderLeadRepository = new Lazy<ITechOrderLeadRepository>>(() => new TechOrderLeadRepository(_context));
+        _techOrderLeadRepository = new Lazy<ITechOrderLeadRepository>(() => new TechOrderLeadRepository(_context));
         _workerRepository = new Lazy<IWorkerRepository>(() => new WorkerRepository(_context));
     }
 
