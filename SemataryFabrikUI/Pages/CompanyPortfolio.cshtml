@@ -1,0 +1,138 @@
+﻿@page
+@model SemataryFabrikUI.Pages.CompanyPortfolioModel
+@{
+}
+
+<section id="main-container" class="main-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="shuffle-btn-group">
+                    <label class="active" for="all">
+                        <input type="radio" name="shuffle-filter" id="all" value="all" checked="checked">Все проекты
+                    </label>
+                    <label for="corporate">
+                        <input type="radio" name="shuffle-filter" id="corporate" value="corporate">Корпоративные мероприятия
+                    </label>
+                    <label for="weddings">
+                        <input type="radio" name="shuffle-filter" id="weddings" value="weddings">Свадьбы и банкеты
+                    </label>
+                    <label for="concerts">
+                        <input type="radio" name="shuffle-filter" id="concerts" value="concerts">Концерты
+                    </label>
+                    <label for="festivals">
+                        <input type="radio" name="shuffle-filter" id="festivals" value="festivals">Фестивали
+                    </label>
+                </div><!-- project filter end -->
+
+                <div class="row shuffle-wrapper">
+                    <div class="col-1 shuffle-sizer"></div>
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;corporate&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project1.jpg">
+                                <img class="img-fluid" src="images/projects/project1.jpg" alt="Корпоративный форум">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Годовой форум компании «Рога и Копыта»</a>
+                                    </h3>
+                                    <p class="project-cat">1500 участников, 3D-мэппинг, синхронный перевод</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 1 end -->
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;weddings&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project2.jpg">
+                                <img class="img-fluid" src="images/projects/project2.jpg" alt="Свадебная церемония">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Премиум свадьба на 300 гостей</a>
+                                    </h3>
+                                    <p class="project-cat">Архитектурная подсветка, кинетический свет, live-звук</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 2 end -->
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;concerts&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project3.jpg">
+                                <img class="img-fluid" src="images/projects/project3.jpg" alt="Рок-концерт">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Городской рок-фестиваль</a>
+                                    </h3>
+                                    <p class="project-cat">20 000 зрителей, лазерное шоу, line-array системы</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 3 end -->
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;festivals&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project4.jpg">
+                                <img class="img-fluid" src="images/projects/project4.jpg" alt="Гастрономический фестиваль">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Фестиваль уличной еды</a>
+                                    </h3>
+                                    <p class="project-cat">12 сцен, мобильные звуковые решения, LED-экраны</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 4 end -->
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;corporate&quot;,&quot;festivals&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project5.jpg">
+                                <img class="img-fluid" src="images/projects/project5.jpg" alt="Презентация продукта">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Запуск нового автомобиля</a>
+                                    </h3>
+                                    <p class="project-cat">Интерактивная инсталляция, проекционное оборудование</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 5 end -->
+
+                    <div class="col-lg-4 col-md-6 shuffle-item" data-groups="[&quot;weddings&quot;,&quot;concerts&quot;]">
+                        <div class="project-img-container">
+                            <a class="gallery-popup" href="images/projects/project6.jpg">
+                                <img class="img-fluid" src="images/projects/project6.jpg" alt="Кино под открытым небом">
+                                <span class="gallery-icon"><i class="fa fa-plus"></i></span>
+                            </a>
+                            <div class="project-item-info">
+                                <div class="project-item-info-content">
+                                    <h3 class="project-item-title">
+                                        <a href="#">Летний кинотеатр</a>
+                                    </h3>
+                                    <p class="project-cat">Кинопроекция 4K, зона кинозвука Dolby Atmos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- проект 6 end -->
+                </div><!-- shuffle end -->
+            </div>
+
+
+        </div><!-- Content row end -->
+    </div><!-- Container end -->
+</section><!-- Main container end -->
