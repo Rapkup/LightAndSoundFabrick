@@ -15,6 +15,5 @@ public class IndexModel : PageModel
     public void OnGet()
     {
 
-        var a = cartItemService.GetCartIdWithProduct(new Guid());
     }
 }
