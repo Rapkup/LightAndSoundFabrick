@@ -70,7 +70,7 @@
                                         </div>
                                     </li>
                                     <li class="header-get-a-quote">
-                                        <a class="btn btn-primary" href="contact.html">Авторизоваться</a>
+                                        <a class="btn btn-primary" asp-page="/Login">Авторизоваться</a>
                                     </li>
                                 </ul><!-- Ul end -->
                             </div><!-- header right end -->
@@ -91,19 +91,19 @@
                                 <div id="navbar-collapse" class="collapse navbar-collapse">
                                     <ul class="nav navbar-nav mr-auto">
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">Главная</a>
-                                        </li>
-
-                                        <li class="nav-item dropdown">
-                                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Компания<i class="fa fa-angle-down"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">О нас</a></li>
-                                                <li><a href="#">Наши специалисты</a></li>
-                                            </ul>
+                                            <a class="nav-link" asp-page="/Index">Главная</a>
                                         </li>
 
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">Техническое обеспечение</a>
+                                            <a class="nav-link" asp-page="/About">О нас</a>
+                                        </li>
+
+                                        <li class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Техническое обеспечение<i class="fa fa-angle-down"></i></a>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#">Собрать заказ</a></li>
+                                                <li><a asp-page="/TechSupportInfo">Инфо</a></li>
+                                            </ul>
                                         </li>
                                         
                                         <li class="nav-item dropdown">
@@ -117,11 +117,11 @@
                                         </li>
                                 
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">Наше портфолио</a>
+                                            <a class="nav-link" asp-page="/CompanyPortfolio">Наше портфолио</a>
                                         </li>
 
              
-                                        <li class="nav-item"><a class="nav-link" href="contact.html">Контакты</a></li>
+                                        <li class="nav-item"><a class="nav-link" asp-page="/ContactInfo">Контакты</a></li>
                                     </ul>
                                 </div>
                             </nav>

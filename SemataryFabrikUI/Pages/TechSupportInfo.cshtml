@@ -1,0 +1,179 @@
+﻿@page
+@model SemataryFabrikUI.Pages.Shared.TechSupportInfoModel
+@{
+}
+
+
+<div id="banner-area" class="banner-area" style="background-image:url(images/banner/banner1.jpg)">
+    <div class="banner-text">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="banner-heading">
+                        <h1 class="banner-title">Услуги</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb justify-content-center">
+                                <li class="breadcrumb-item"><a href="#">Главная</a></li>
+                                <li class="breadcrumb-item"><a href="#">Услуги</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Техническое обеспечние</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div><!-- Col end -->
+            </div><!-- Row end -->
+        </div><!-- Container end -->
+    </div><!-- Banner text end -->
+</div><!-- Banner area end -->
+
+<section id="main-container" class="main-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-8 col-lg-8">
+                <div class="content-inner-page">
+
+                    <h2 class="column-title mrt-0">Соберите свой идеальный комплект оборудования</h2>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p>
+                                Создайте уникальную конфигурацию для вашего мероприятия в 4 простых шага. Выбирайте компоненты,
+                                а система автоматически рассчитает стоимость и проверит совместимость оборудования.
+                            </p>
+
+                            <div class="config-steps">
+                                <div class="step-item active">
+                                    <span class="step-number">1</span>
+                                    <span class="step-title">Сцена и конструкции</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">2</span>
+                                    <span class="step-title">Звуковое оборудование</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">3</span>
+                                    <span class="step-title">Световое решение</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">4</span>
+                                    <span class="step-title">Дополнительные моменты</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gap-40"></div>
+
+                    <div id="page-slider" class="page-slider">
+                        <div class="item">
+                            <img loading="lazy" class="img-fluid" src="images/projects/project5.jpg" alt="Конфигуратор сцены" />
+                        </div>
+                        <div class="item">
+                            <img loading="lazy" class="img-fluid" src="images/projects/project6.jpg" alt="Подбор звука" />
+                        </div>
+                    </div>
+
+                    <div class="gap-40"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 class="column-title-small">Преимущества онлайн-конфигуратора</h3>
+
+                            <ul class="list-arrow">
+                                <li>Пошаговый подбор с визуализацией</li>
+                                <li>Автоматическая проверка совместимости компонентов</li>
+                                <li>Мгновенный расчет стоимости</li>
+                                <li>Сохранение черновиков конфигураций</li>
+                                <li>Рекомендации от наших технологов</li>
+                                <li>Возможность сразу отправить запрос менеджеру</li>
+                            </ul>
+
+                            <div class="price-preview mt-4 p-3 bg-light rounded">
+                                <h4>Расчет предварительная стоимости:</h4>
+                                <small>*Точная сумма будет подтверждена менеджером</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mt-5 mt-md-0">
+                            <h3 class="column-title-small">Частые вопросы</h3>
+
+                            <div class="accordion accordion-group accordion-classic" id="config-accordion">
+                                <div class="card">
+                                    <div class="card-header p-0 bg-transparent" id="headingOne">
+                                        <h2 class="mb-0">
+                                            <button class="btn btn-block text-left" type="button" data-toggle="collapse"
+                                                    data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                Как сохранить конфигурацию?
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                                         data-parent="#config-accordion">
+                                        <div class="card-body">
+                                            Система автоматически сохраняет все изменения. Вы можете получить ссылку для продолжения
+                                            настройки или отправить конфигурацию менеджеру.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header p-0 bg-transparent" id="headingTwo">
+                                        <h2 class="mb-0">
+                                            <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse"
+                                                    data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                Можно ли изменить заказ после оформления?
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
+                                         data-parent="#config-accordion">
+                                        <div class="card-body">
+                                            Да, вы можете вносить изменения в конфигурацию за 72 часа до мероприятия.
+                                            Все правки согласовываются с техническим специалистом.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header p-0 bg-transparent" id="headingThree">
+                                        <h2 class="mb-0">
+                                            <button class="btn btn-block text-left collapsed" type="button" data-toggle="collapse"
+                                                    data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                Что включает стоимость?
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+                                         data-parent="#config-accordion">
+                                        <div class="card-body">
+                                            В расчет включены: аренда оборудования, доставка, монтаж/демонтаж и базовое обслуживание.
+                                            Дополнительные услуги указываются отдельно.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gap-40"></div>
+
+                    <div class="call-to-action classic">
+                        <div class="row align-items-center">
+                            <div class="col-md-8 text-center text-md-left">
+                                <div class="call-to-action-text">
+                                    <h3 class="action-title">Готовы собрать свой идеальный комплект?</h3>
+                                    <p>Начните прямо сейчас</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center text-md-right mt-3 mt-md-0">
+                                <div class="call-to-action-btn">
+                                    <a class="btn btn-primary mr-2" href="#">Начать конфигурацию</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
