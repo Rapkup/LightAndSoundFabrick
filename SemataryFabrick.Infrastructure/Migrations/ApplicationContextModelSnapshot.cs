@@ -115,10 +115,14 @@ namespace SemataryFabrick.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("jsonb");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("DiscountId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("InventoryId")
                         .HasColumnType("uuid");

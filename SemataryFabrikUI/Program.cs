@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 
+
 await builder.Services.AddInfrastructureAsync(builder.Configuration);
 await builder.Services.AddApplicationLayerAsync(builder.Configuration);
 

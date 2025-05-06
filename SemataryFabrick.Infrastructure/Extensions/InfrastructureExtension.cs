@@ -12,7 +12,10 @@ public static class InfrastructureExtension
     {
         services
             .AddDbContext(configuration)
-            .AddRepositories();
+            .AddRepositories()
+        .AddDataSeeders();
+
+        await services.AddSeedDataForDevelopmentAsync();
     }
 
     private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration)
@@ -30,5 +33,29 @@ public static class InfrastructureExtension
         services.AddScoped<IRepositoryManager, RepositoryManager>();
 
         return services;
+    }
+
+    private static IServiceCollection AddDataSeeders(this IServiceCollection services)
+    {
+        services.AddScoped<DataSeederExtension>();
+
+        return services;
+    }
+
+    private static async Task AddSeedDataForDevelopmentAsync(this IServiceCollection services)
+    {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            using var scope = services.BuildServiceProvider().CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+            if (!context.Items.Any())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<DataSeederExtension>();
+
+                await seeder.SeedDataAsync();
+            }
+
+        }
     }
 }

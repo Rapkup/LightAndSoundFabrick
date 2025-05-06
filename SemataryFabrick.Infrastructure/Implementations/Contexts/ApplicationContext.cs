@@ -171,9 +171,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         // Конфигурация Item
         modelBuilder.Entity<Item>(e =>
         {
-            e.HasKey(i => i.Id);
-            e.Property(i => i.Description)
-                .HasColumnType("jsonb");
+            e.HasKey(i => i.Id);      
 
             e.HasOne(i => i.Discount)
                 .WithMany(d => d.Items)
