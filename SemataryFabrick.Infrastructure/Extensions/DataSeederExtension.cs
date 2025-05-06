@@ -21,7 +21,7 @@ public class DataSeederExtension(ApplicationContext context)
         await SeedSubCategories();
         await SeedItems();
         await SeedOrdersWithRelatedData();
-        // await SeedCartsWithItems(); // Закомментировано по требованию
+        // await SeedCartsWithItems(); 
     }
 
     private async Task SeedUsers()
@@ -33,7 +33,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.Director,
             UserName = "director",
-            Password = "director123",
+            Password = "1234",
             Email = "director@company.com",
             PhoneNumber = "+1234567890",
             FirstName = "Иван",
@@ -46,7 +46,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.OrderManager,
             UserName = "manager",
-            Password = "manager123",
+            Password = "1234",
             Email = "manager@company.com",
             PhoneNumber = "+1234567891",
             FirstName = "Алексей",
@@ -59,7 +59,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.TechOrderLead,
             UserName = "techlead1",
-            Password = "techlead123",
+            Password = "1234",
             Email = "techlead1@company.com",
             PhoneNumber = "+1234567892",
             FirstName = "Сергей",
@@ -71,7 +71,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.TechOrderLead,
             UserName = "techlead2",
-            Password = "techlead123",
+            Password = "1234",
             Email = "techlead2@company.com",
             PhoneNumber = "+1234567893",
             FirstName = "Дмитрий",
@@ -86,7 +86,7 @@ public class DataSeederExtension(ApplicationContext context)
                 Id = Guid.NewGuid(),
                 UserType = UserType.Worker,
                 UserName = "worker1",
-                Password = "worker123",
+                Password = "1234",
                 Email = "worker1@company.com",
                 PhoneNumber = "+1234567894",
                 FirstName = "Петр",
@@ -97,7 +97,7 @@ public class DataSeederExtension(ApplicationContext context)
                 Id = Guid.NewGuid(),
                 UserType = UserType.Worker,
                 UserName = "worker2",
-                Password = "worker123",
+                Password = "1234",
                 Email = "worker2@company.com",
                 PhoneNumber = "+1234567895",
                 FirstName = "Андрей",
@@ -108,7 +108,7 @@ public class DataSeederExtension(ApplicationContext context)
                 Id = Guid.NewGuid(),
                 UserType = UserType.Worker,
                 UserName = "worker3",
-                Password = "worker123",
+                Password = "1234",
                 Email = "worker3@company.com",
                 PhoneNumber = "+1234567896",
                 FirstName = "Николай",
@@ -119,7 +119,7 @@ public class DataSeederExtension(ApplicationContext context)
                 Id = Guid.NewGuid(),
                 UserType = UserType.Worker,
                 UserName = "worker4",
-                Password = "worker123",
+                Password = "1234",
                 Email = "worker4@company.com",
                 PhoneNumber = "+1234567897",
                 FirstName = "Артем",
@@ -133,7 +133,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.IndividualCustomer,
             UserName = "indcustomer1",
-            Password = "customer123",
+            Password = "1234",
             Email = "indcustomer1@mail.com",
             PhoneNumber = "+7987654321",
             FirstName = "Олег",
@@ -146,7 +146,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.IndividualCustomer,
             UserName = "indcustomer2",
-            Password = "customer123",
+            Password = "1234",
             Email = "indcustomer2@mail.com",
             PhoneNumber = "+7987654322",
             FirstName = "Елена",
@@ -160,7 +160,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.LegalCustomer,
             UserName = "legalcustomer1",
-            Password = "customer123",
+            Password = "1234",
             Email = "legalcustomer1@company.com",
             PhoneNumber = "+7987654333",
             CompanyName = "ООО 'Мероприятия и Ко'",
@@ -174,7 +174,7 @@ public class DataSeederExtension(ApplicationContext context)
             Id = Guid.NewGuid(),
             UserType = UserType.LegalCustomer,
             UserName = "legalcustomer2",
-            Password = "customer123",
+            Password = "1234",
             Email = "legalcustomer2@company.com",
             PhoneNumber = "+7987654334",
             CompanyName = "ЗАО 'Крупные События'",
@@ -437,7 +437,7 @@ public class DataSeederExtension(ApplicationContext context)
         items.AddRange(new[]
         {
             CreateItem(
-                "K&M 210/9",
+                "K&M 210-9",
                 "Стойка для микрофона",
                 1500,
                 standsSubCat.Id,
@@ -532,33 +532,33 @@ public class DataSeederExtension(ApplicationContext context)
         var ledPanelsSubCat = subCategories.First(sc => sc.Name == "Светодиодные панели");
         items.AddRange(new[]
         {
-    CreateItem(
-        "Chauvet COLORband PiX",
-        "Светодиодная панель малая",
-        12000,
-        ledPanelsSubCat.Id,
-        new Dictionary<string, string>
-        {
-            {"Тип", "LED панель"},
-            {"Размер", "0.5 x 0.5 м"},
-            {"Яркость", "800 нит"},
-            {"Пикселей", "256"},
-            {"Потребление", "200 Вт"}
-        }),
-    CreateItem(
-        "Eurolite LED BAR-12",
-        "Светодиодная панель большая",
-        18000,
-        ledPanelsSubCat.Id,
-        new Dictionary<string, string>
-        {
-            {"Тип", "LED панель"},
-            {"Размер", "1 x 1 м"},
-            {"Яркость", "1200 нит"},
-            {"Пикселей", "512"},
-            {"Потребление", "400 Вт"}
-        })
-});
+            CreateItem(
+                "Chauvet COLORband PiX",
+                "Светодиодная панель малая",
+                12000,
+                ledPanelsSubCat.Id,
+                new Dictionary<string, string>
+                {
+                    {"Тип", "LED панель"},
+                    {"Размер", "0.5 x 0.5 м"},
+                    {"Яркость", "800 нит"},
+                    {"Пикселей", "256"},
+                    {"Потребление", "200 Вт"}
+                }),
+                    CreateItem(
+                        "Eurolite LED BAR-12",
+                        "Светодиодная панель большая",
+                        18000,
+                        ledPanelsSubCat.Id,
+                        new Dictionary<string, string>
+                        {
+                    {"Тип", "LED панель"},
+                    {"Размер", "1 x 1 м"},
+                    {"Яркость", "1200 нит"},
+                    {"Пикселей", "512"},
+                    {"Потребление", "400 Вт"}
+                })
+        });
 
         // Генератор эффектов
         var effectGenSubCat = subCategories.First(sc => sc.Name == "Генератор эффектов");

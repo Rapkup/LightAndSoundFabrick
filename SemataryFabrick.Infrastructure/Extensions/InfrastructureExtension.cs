@@ -13,7 +13,7 @@ public static class InfrastructureExtension
         services
             .AddDbContext(configuration)
             .AddRepositories()
-           .AddDataSeeders();
+        .AddDataSeeders();
 
         await services.AddSeedDataForDevelopmentAsync();
     }
