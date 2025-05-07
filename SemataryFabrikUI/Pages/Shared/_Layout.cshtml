@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    const string INDIVIDUAL = "IndividualCustomer";
+    const string LEGAL = "LegalCustomer";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 
@@ -70,7 +75,25 @@
                                         </div>
                                     </li>
                                     <li class="header-get-a-quote">
-                                        <a class="btn btn-primary" asp-page="/Login">Авторизоваться</a>
+                                        @if (Context.Session.GetString("IsLoggedIn") == "true" &&
+                                            (Context.Session.GetString("UserType") == INDIVIDUAL ||
+                                             Context.Session.GetString("UserType") == LEGAL))
+                                        {
+                                            <div class="btn-group" role="group">
+                                                <a class="btn btn-primary mr-2" asp-page="/Cart">
+                                                    <i class="fa fa-shopping-cart"></i>
+                                                    <span class="badge badge-pill badge-danger"></span>
+                                                </a>
+                                                <a class="btn btn-primary mr-2" asp-page="/Account/Personal">Личный кайнет</a>
+                                                <form class="d-inline" asp-page="/Authorization/Logout" method="post">
+                                                    <button type="submit" class="btn btn-primary">Выйти</button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <a class="btn btn-primary" asp-page="/Authorization/Login">Авторизоваться</a>
+                                        }
                                     </li>
                                 </ul><!-- Ul end -->
                             </div><!-- header right end -->
@@ -105,7 +128,7 @@
                                                 <li><a asp-page="/TechSupportInfo">Инфо</a></li>
                                             </ul>
                                         </li>
-                                        
+
                                         <li class="nav-item dropdown">
                                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Аренда оборудования<i class="fa fa-angle-down"></i></a>
                                             <ul class="dropdown-menu" role="menu">
@@ -115,12 +138,12 @@
                                                 <li><a href="#">Сцена и сценические конструкции</a></li>
                                             </ul>
                                         </li>
-                                
+
                                         <li class="nav-item">
                                             <a class="nav-link" asp-page="/CompanyPortfolio">Наше портфолио</a>
                                         </li>
 
-             
+
                                         <li class="nav-item"><a class="nav-link" asp-page="/ContactInfo">Контакты</a></li>
                                     </ul>
                                 </div>
@@ -139,7 +162,7 @@
         <!--/ Header end -->
         @RenderBody()
 
-       
+
         <footer id="footer" class="footer bg-overlay">
             <div class="footer-main">
                 <div class="container">
@@ -191,6 +214,7 @@
         ================================================== -->
         <!-- initialize jQuery Library -->
         <script src="plugins/jQuery/jquery.min.js"></script>
+
         <!-- Bootstrap jQuery -->
         <script src="plugins/bootstrap/bootstrap.min.js" defer></script>
         <!-- Slick Carousel -->

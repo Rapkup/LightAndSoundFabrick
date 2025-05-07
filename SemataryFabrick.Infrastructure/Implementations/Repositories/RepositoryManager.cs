@@ -23,6 +23,7 @@ public class RepositoryManager : IRepositoryManager
     private readonly Lazy<IWorkerRepository> _workerRepository;
     private readonly Lazy<IWorkTaskAssignmentRepository> _workTaskAssignmentRepository;
     private readonly Lazy<IWorkTaskRepository> _workTaskRepository;
+    private readonly Lazy<IUserRepository> _userRepository;
 
     public RepositoryManager(ApplicationContext context)
     {
@@ -45,6 +46,7 @@ public class RepositoryManager : IRepositoryManager
         _orderManagerRepository = new Lazy<IOrderManagerRepository>(() => new OrderManagerRepository(_context));
         _techOrderLeadRepository = new Lazy<ITechOrderLeadRepository>(() => new TechOrderLeadRepository(_context));
         _workerRepository = new Lazy<IWorkerRepository>(() => new WorkerRepository(_context));
+        _userRepository = new Lazy<IUserRepository>(() => new UserRepository(_context));
     }
 
     public ICartItemRepository CartItem => _cartItemRepository.Value;
@@ -65,6 +67,7 @@ public class RepositoryManager : IRepositoryManager
     public IWorkerRepository Worker => _workerRepository.Value;
     public IWorkTaskAssignmentRepository TaskAssignment => _workTaskAssignmentRepository.Value;
     public IWorkTaskRepository WorkTask => _workTaskRepository.Value;
+    public IUserRepository User => _userRepository.Value;
 
     public async Task SaveAsync() => await _context.SaveChangesAsync();
 }

@@ -1,12 +1,55 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SemataryFabrick.Application.Contracts.Services;
+using SemataryFabrick.Application.Entities.DTOs.UserDtos;
+using SemataryFabrick.Application.Entities.Exceptions;
 
 namespace SemataryFabrikUI.Pages.Authorization
 {
     public class LoginModel : PageModel
     {
+        private readonly IUserService _userService;
+
+        [BindProperty]
+        public UserLoginDto UserLogin { get; set; }
+
+        public LoginModel(IUserService userService)
+        {
+            _userService = userService;
+        }
         public void OnGet()
         {
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            try
+            {
+                var user = await _userService.Login(UserLogin.username, UserLogin.password);
+
+                if (user != null)
+                {
+                    HttpContext.Session.SetString("IsLoggedIn", "true");
+                    HttpContext.Session.SetString("UserId", user.Id.ToString());
+                    HttpContext.Session.SetString("UserType", user.UserType.ToString());
+                    HttpContext.Session.SetString("Username", user.UserName);
+
+                    return RedirectToPage("/Index");
+                }
+
+                ModelState.AddModelError("", "Ќеверный логин или пароль");
+            }
+            catch (EntityNotFoundException)
+            {
+                ModelState.AddModelError("", "ѕользователь с таким именем или паролем не найден");
+            }
+
+            return Page();
         }
     }
 }

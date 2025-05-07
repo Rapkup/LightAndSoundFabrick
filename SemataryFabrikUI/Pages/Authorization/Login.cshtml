@@ -1,4 +1,64 @@
 ﻿@page
 @model SemataryFabrikUI.Pages.Authorization.LoginModel
 @{
+    ViewData["Title"] = "Login Page";
+    Layout = "~/Pages/Authorization/_AuthorizationLayout.cshtml";
+}
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 text-center mb-4">
+                <h2 class="heading-section">Добро пожаловать</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <h3>Авторизироваться</h3>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <form method="post">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+                                <label asp-for="UserLogin.username" class="form-label">Логин</label>
+                                <input asp-for="UserLogin.username" class="form-control" required>
+                                <span asp-validation-for="UserLogin.username" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="UserLogin.password" class="form-label">Пароль</label>
+                                <input asp-for="UserLogin.password" type="password" class="form-control" required>
+                                <span asp-validation-for="UserLogin.password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Войти</button>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="mb-0">Нет аккаунта <a asp-page="/Authorization/Registration">Зарегистрироваться</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        $(document).on('click', '.toggle-password', function() {
+            $(this).find('i').toggleClass('fa-eye fa-eye-slash');
+            var input = $($(this).attr('toggle'));
+            input.attr('type', input.attr('type') === 'password' ? 'text' : 'password');
+        });
+    </script>
 }

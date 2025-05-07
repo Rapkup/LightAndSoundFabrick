@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SemataryFabrick.Application.Implementations;
-using SemataryFabrick.Domain.Contracts.Services;
+using SemataryFabrick.Application.Contracts.Services;
 
 namespace SemataryFabrick.Application.Extensions;
 public static class ApplicationExtensions

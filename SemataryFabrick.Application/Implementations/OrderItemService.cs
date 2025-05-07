@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Contracts.Services;
+﻿using SemataryFabrick.Application.Contracts.Services;
 
 namespace SemataryFabrick.Application.Implementations;
 public class OrderItemService : IOrderItemService

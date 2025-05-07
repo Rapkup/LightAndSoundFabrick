@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SemataryFabrick.Domain.Contracts.Services;
+using SemataryFabrick.Application.Contracts.Services;
 
 namespace SemataryFabrikUI.Pages;
 public class IndexModel : PageModel
