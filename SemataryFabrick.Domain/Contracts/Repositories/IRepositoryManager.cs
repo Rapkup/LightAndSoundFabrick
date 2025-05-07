@@ -19,5 +19,6 @@ public interface IRepositoryManager
     IWorkerRepository Worker { get; }
     IWorkTaskAssignmentRepository TaskAssignment { get; }
     IWorkTaskRepository WorkTask { get; }
+    IUserRepository User { get; }
     Task SaveAsync();
 }

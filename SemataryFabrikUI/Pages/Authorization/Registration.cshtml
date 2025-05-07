@@ -1,4 +1,179 @@
 ﻿@page
 @model SemataryFabrikUI.Pages.Authorization.RegistrationModel
 @{
+    ViewData["Title"] = "Register Page";
+    Layout = "~/Pages/Authorization/_AuthorizationLayout.cshtml";
+}
+
+<section class="form-section">
+    <div class="text-center">
+        <h2 class="heading-section">Регистрация</h2>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <form method="post" class="needs-validation" novalidate>
+        @Html.AntiForgeryToken()
+        <div class="row g-4">
+            <!-- Левая колонка -->
+            <div class="col-md-6">
+                <div>
+                    <label asp-for="UserDto.UserType" class="form-label">Тип клиента *</label>
+                    <select asp-for="UserDto.UserType" class="form-select form-select-lg" id="userType" required>
+                        <option value="">Выберите тип</option>
+                        <option value="IndividualCustomer">Физическое лицо</option>
+                        <option value="LegalCustomer">Юридическое лицо</option>
+                    </select>
+                    <span asp-validation-for="UserDto.UserType" class="text-danger small"></span>
+                </div>
+
+                <div>
+                    <label asp-for="UserDto.UserName" class="form-label">Логин *</label>
+                    <input asp-for="UserDto.UserName" class="form-control form-control-lg" required>
+                    <span asp-validation-for="UserDto.UserName" class="text-danger small"></span>
+                </div>
+
+                <div>
+                    <label asp-for="UserDto.Password" class="form-label">Пароль *</label>
+                    <input asp-for="UserDto.Password" type="password" class="form-control form-control-lg" required>
+                    <span asp-validation-for="UserDto.Password" class="text-danger small"></span>
+                </div>
+
+                <div>
+                    <label asp-for="UserDto.Email" class="form-label">Email *</label>
+                    <input asp-for="UserDto.Email" type="email" class="form-control form-control-lg" required>
+                    <span asp-validation-for="UserDto.Email" class="text-danger small"></span>
+                </div>
+
+                <div>
+                    <label asp-for="UserDto.PhoneNumber" class="form-label">Телефон *</label>
+                    <input asp-for="UserDto.PhoneNumber" class="form-control form-control-lg" required>
+                    <span asp-validation-for="UserDto.PhoneNumber" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Правая колонка -->
+            <div class="col-md-6">
+                <!-- Физическое лицо -->
+                <div id="individualFields" class="dynamic-section" style="display:none;">
+                    <h5>Данные физ. лица</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="UserDto.FirstName" class="form-label">Имя *</label>
+                            <input asp-for="UserDto.FirstName" class="form-control form-control-lg">
+                            <span asp-validation-for="UserDto.FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="UserDto.LastName" class="form-label">Фамилия *</label>
+                            <input asp-for="UserDto.LastName" class="form-control form-control-lg">
+                            <span asp-validation-for="UserDto.LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="UserDto.PassportIdNumber" class="form-label">Номер паспорта *</label>
+                        <input asp-for="UserDto.PassportIdNumber" class="form-control form-control-lg">
+                        <span asp-validation-for="UserDto.PassportIdNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Юридическое лицо -->
+                <div id="legalFields" class="dynamic-section" style="display:none;">
+                    <h5>Данные юр. лица</h5>
+                    <div>
+                        <label asp-for="UserDto.CompanyName" class="form-label">Название компании *</label>
+                        <input asp-for="UserDto.CompanyName" class="form-control form-control-lg">
+                        <span asp-validation-for="UserDto.CompanyName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label asp-for="UserDto.TaxIdNumber" class="form-label">ИНН *</label>
+                            <input asp-for="UserDto.TaxIdNumber" class="form-control form-control-lg">
+                            <span asp-validation-for="UserDto.TaxIdNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="UserDto.LegalAddress" class="form-label">Юридический адрес *</label>
+                            <input asp-for="UserDto.LegalAddress" class="form-control form-control-lg">
+                            <span asp-validation-for="UserDto.LegalAddress" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="UserDto.ContactPersonFullName" class="form-label">Контактное лицо (ФИО) *</label>
+                        <input asp-for="UserDto.ContactPersonFullName" class="form-control form-control-lg">
+                        <span asp-validation-for="UserDto.ContactPersonFullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <!-- Всегда передаём false, если чек не отмечен -->
+                        <input type="hidden" name="UserDto.isGovernment" value="false" />
+
+                        <!-- Сам чекбокс. Если в модели было true — добавляем checked -->
+                        <input type="checkbox"
+                               name="UserDto.isGovernment"
+                               id="isGovernment"
+                               class="form-check-input"
+                               value="true"
+                        @(Model.UserDto.isGovernment == true ? "checked" : "") />
+
+                        <label class="form-check-label fw-bold" for="isGovernment">
+                            Государственное учреждение
+                        </label>
+                    </div>
+
+
+
+                    <div id="governmentFields" class="dynamic-subsection" style="display:none;">
+                        <label asp-for="UserDto.GovernmentCode" class="form-label">Код учреждения *</label>
+                        <input asp-for="UserDto.GovernmentCode" class="form-control form-control-lg" disabled>
+                        <span asp-validation-for="UserDto.GovernmentCode" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg px-5">Зарегистрироваться</button>
+            <p class="mt-3 mb-0">
+                Уже есть аккаунт? <a asp-page="/Authorization/Login" class="text-decoration-none">Войти</a>
+            </p>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        document.getElementById('userType').addEventListener('change', function () {
+            const type = this.value;
+            document.getElementById('individualFields').style.display = type === 'IndividualCustomer' ? 'block' : 'none';
+            document.getElementById('legalFields').style.display = type === 'LegalCustomer' ? 'block' : 'none';
+            toggleGovernmentFields(false);
+        });
+
+                function toggleGovernmentFields(checked) {
+            const govFields = document.getElementById('governmentFields');
+            const govInput  = govFields.querySelector('input');
+
+            govFields.style.display = checked ? 'block' : 'none';
+            govInput.disabled       = !checked;
+            govInput.required       = checked;
+            if (!checked) govInput.value = ''; // здесь и обнуляется
+        }
+
+
+        document.getElementById('isGovernment').addEventListener('change', function () {
+            toggleGovernmentFields(this.checked);
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const userType = document.getElementById('userType').value;
+            if (userType) {
+                document.getElementById(userType === 'IndividualCustomer' ? 'individualFields' : 'legalFields').style.display = 'block';
+            }
+
+            const isGovCheckbox = document.getElementById('isGovernment');
+            toggleGovernmentFields(isGovCheckbox.checked);
+        });
+    </script>
 }

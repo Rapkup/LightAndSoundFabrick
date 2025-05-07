@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Contracts.Services;
+﻿using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
 
 namespace SemataryFabrick.Application.Implementations;

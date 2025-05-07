@@ -1,6 +1,6 @@
 ﻿using SemataryFabrick.Domain.Entities.Models.CartModels;
 
-namespace SemataryFabrick.Domain.Contracts.Services;
+namespace SemataryFabrick.Application.Contracts.Services;
 public interface ICartItemService
 {
     Task<CartItem> GetCartIdWithProduct(Guid id);
