@@ -12,7 +12,7 @@ using SemataryFabrick.Infrastructure.Implementations.Contexts;
 namespace SemataryFabrick.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250505201614_Initial")]
+    [Migration("20250507220530_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -54,6 +54,9 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateOnly?>("EventDate")
+                        .HasColumnType("date");
+
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
 
@@ -73,15 +76,26 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Property<Guid>("CartId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("DiscountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("EndRentDate")
+                        .HasColumnType("date");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
+                    b.Property<DateOnly?>("StartRentDate")
+                        .HasColumnType("date");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
+
+                    b.HasIndex("DiscountId");
 
                     b.HasIndex("ProductId");
 
@@ -120,9 +134,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("DiscountId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("ImageName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -144,8 +155,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DiscountId");
 
                     b.HasIndex("InventoryId");
 
@@ -181,14 +190,10 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("EventAddress")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateOnly?>("EventDate")
                         .HasColumnType("date");
-
-                    b.Property<Guid?>("IndividualCustomerId")
-                        .HasColumnType("uuid");
 
                     b.Property<Guid>("OrderManagerId")
                         .HasColumnType("uuid");
@@ -211,8 +216,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
-
-                    b.HasIndex("IndividualCustomerId");
 
                     b.HasIndex("OrderManagerId");
 
@@ -251,6 +254,9 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("DiscountId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("OrderBaseId")
                         .HasColumnType("uuid");
 
@@ -261,6 +267,8 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
 
                     b.HasIndex("OrderBaseId");
 
@@ -493,6 +501,10 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId");
+
                     b.HasOne("SemataryFabrick.Domain.Entities.Models.Items.Item", "Product")
                         .WithMany("CartItems")
                         .HasForeignKey("ProductId")
@@ -501,15 +513,13 @@ namespace SemataryFabrick.Infrastructure.Migrations
 
                     b.Navigation("Cart");
 
+                    b.Navigation("Discount");
+
                     b.Navigation("Product");
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Items.Item", b =>
                 {
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Discount", "Discount")
-                        .WithMany("Items")
-                        .HasForeignKey("DiscountId");
-
                     b.HasOne("SemataryFabrick.Domain.Entities.Models.Items.ItemInventory", "Inventory")
                         .WithMany("Items")
                         .HasForeignKey("InventoryId")
@@ -522,8 +532,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Discount");
-
                     b.Navigation("Inventory");
 
                     b.Navigation("SubCategory");
@@ -531,15 +539,11 @@ namespace SemataryFabrick.Infrastructure.Migrations
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", b =>
                 {
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.UserModels.LegalCustomer", "Customer")
-                        .WithMany("OrderBases")
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.UserModels.ApplicationUser", "Customer")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("SemataryFabrick.Domain.Entities.Models.UserModels.IndividualCustomer", null)
-                        .WithMany("OrderBases")
-                        .HasForeignKey("IndividualCustomerId");
 
                     b.HasOne("SemataryFabrick.Domain.Entities.Models.UserModels.OrderManager", "OrderManager")
                         .WithMany("OrderBases")
@@ -581,6 +585,10 @@ namespace SemataryFabrick.Infrastructure.Migrations
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderItem", b =>
                 {
+                    b.HasOne("SemataryFabrick.Domain.Entities.Models.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId");
+
                     b.HasOne("SemataryFabrick.Domain.Entities.Models.OrderModels.OrderBase", "OrderBase")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderBaseId")
@@ -592,6 +600,8 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Discount");
 
                     b.Navigation("OrderBase");
 
@@ -633,11 +643,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Discount", b =>
-                {
-                    b.Navigation("Items");
-                });
-
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.Items.Item", b =>
                 {
                     b.Navigation("CartItems");
@@ -675,16 +680,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.WorkTask", b =>
                 {
                     b.Navigation("WorkTaskAssignments");
-                });
-
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.IndividualCustomer", b =>
-                {
-                    b.Navigation("OrderBases");
-                });
-
-            modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.LegalCustomer", b =>
-                {
-                    b.Navigation("OrderBases");
                 });
 
             modelBuilder.Entity("SemataryFabrick.Domain.Entities.Models.UserModels.OrderManager", b =>

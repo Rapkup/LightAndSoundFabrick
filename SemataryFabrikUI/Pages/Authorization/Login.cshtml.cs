@@ -9,13 +9,15 @@ namespace SemataryFabrikUI.Pages.Authorization
     public class LoginModel : PageModel
     {
         private readonly IUserService _userService;
+        private readonly ICartService _cartService;
 
         [BindProperty]
         public UserLoginDto UserLogin { get; set; }
 
-        public LoginModel(IUserService userService)
+        public LoginModel(IUserService userService, ICartService cartService)
         {
             _userService = userService;
+            _cartService = cartService;
         }
         public void OnGet()
         {
@@ -38,6 +40,7 @@ namespace SemataryFabrikUI.Pages.Authorization
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     HttpContext.Session.SetString("UserType", user.UserType.ToString());
                     HttpContext.Session.SetString("Username", user.UserName);
+                    await UpdateCartBadge();
 
                     return RedirectToPage("/Index");
                 }
@@ -50,6 +53,12 @@ namespace SemataryFabrikUI.Pages.Authorization
             }
 
             return Page();
+        }
+        private async Task UpdateCartBadge()
+        {
+            var userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
+            var count = await _cartService.GetCartItemsCountAsync(userId);
+            HttpContext.Session.SetInt32("CartItemsCount", count);
         }
     }
 }

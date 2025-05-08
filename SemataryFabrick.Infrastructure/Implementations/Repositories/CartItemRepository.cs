@@ -12,9 +12,20 @@ partial class CartItemRepository(ApplicationContext context) : RepositoryBase<Ca
 
     public void UpdateCartItem(CartItem cartItem) => Update(cartItem);
 
+    public async Task<int> GetCartItemsCountByCartIdAsync(Guid cartId)
+    => await Find(ci => ci.CartId == cartId).CountAsync();
+
     public async Task<IEnumerable<CartItem>> GetAllCartItemsAsync()
         => await Find().ToListAsync();
 
     public async Task<CartItem?> GetCartItemAsync(Guid id)
         => await Find(ci => ci.Id == id).FirstOrDefaultAsync();
+
+    public async Task<CartItem?> GetCartItemWithProductAsync(Guid cartItemId)
+    {
+        return await Find(ci => ci.Id == cartItemId)
+                .Include(ci => ci.Product)
+                .Include(ci => ci.Discount)
+                .FirstOrDefaultAsync();
+    }
 }

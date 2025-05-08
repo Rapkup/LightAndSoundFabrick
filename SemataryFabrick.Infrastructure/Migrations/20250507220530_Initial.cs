@@ -120,6 +120,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    EventDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -138,8 +139,8 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    EventAddress = table.Column<string>(type: "text", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    EventAddress = table.Column<string>(type: "text", nullable: true),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: true),
                     StartRentDate = table.Column<DateOnly>(type: "date", nullable: true),
                     EndRentDate = table.Column<DateOnly>(type: "date", nullable: true),
@@ -147,8 +148,7 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     PaymentState = table.Column<int>(type: "integer", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderManagerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TechOrderLeadId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IndividualCustomerId = table.Column<Guid>(type: "uuid", nullable: true)
+                    TechOrderLeadId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,11 +159,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_IndividualCustomerId",
-                        column: x => x.IndividualCustomerId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Orders_Users_OrderManagerId",
                         column: x => x.OrderManagerId,
@@ -188,18 +183,12 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    DiscountId = table.Column<Guid>(type: "uuid", nullable: true),
                     InventoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     SubCategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Items", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Items_Discounts_DiscountId",
-                        column: x => x.DiscountId,
-                        principalTable: "Discounts",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Items_Inventories_InventoryId",
                         column: x => x.InventoryId,
@@ -246,8 +235,11 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
+                    StartRentDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    EndRentDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CartId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiscountId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -258,6 +250,11 @@ namespace SemataryFabrick.Infrastructure.Migrations
                         principalTable: "Carts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Discounts_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discounts",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CartItems_Items_ProductId",
                         column: x => x.ProductId,
@@ -273,11 +270,17 @@ namespace SemataryFabrick.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     OrderBaseId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiscountId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Discounts_DiscountId",
+                        column: x => x.DiscountId,
+                        principalTable: "Discounts",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_OrderItems_Items_ProductId",
                         column: x => x.ProductId,
@@ -348,6 +351,11 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 column: "CartId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CartItems_DiscountId",
+                table: "CartItems",
+                column: "DiscountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CartItems_ProductId",
                 table: "CartItems",
                 column: "ProductId");
@@ -356,11 +364,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 name: "IX_Carts_CustomerId",
                 table: "Carts",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Items_DiscountId",
-                table: "Items",
-                column: "DiscountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Items_InventoryId",
@@ -388,6 +391,11 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 column: "WorkersId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_DiscountId",
+                table: "OrderItems",
+                column: "DiscountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderBaseId",
                 table: "OrderItems",
                 column: "OrderBaseId");
@@ -401,11 +409,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 name: "IX_Orders_CustomerId",
                 table: "Orders",
                 column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_IndividualCustomerId",
-                table: "Orders",
-                column: "IndividualCustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_OrderManagerId",
@@ -452,6 +455,9 @@ namespace SemataryFabrick.Infrastructure.Migrations
                 name: "Carts");
 
             migrationBuilder.DropTable(
+                name: "Discounts");
+
+            migrationBuilder.DropTable(
                 name: "Items");
 
             migrationBuilder.DropTable(
@@ -459,9 +465,6 @@ namespace SemataryFabrick.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkTasks");
-
-            migrationBuilder.DropTable(
-                name: "Discounts");
 
             migrationBuilder.DropTable(
                 name: "Inventories");

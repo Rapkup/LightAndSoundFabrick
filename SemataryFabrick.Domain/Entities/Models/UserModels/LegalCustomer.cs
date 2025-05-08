@@ -10,5 +10,4 @@ public class LegalCustomer : ApplicationUser
     public bool? isGovernment { get; set; }
     public string? GovernmentCode { get; set; }
 
-    public IEnumerable<OrderBase> OrderBases { get; set; }
 }

@@ -8,4 +8,5 @@ public interface IOrderItemRepository
     Task AddOrderItemAsync(OrderItem orderItem);
     Task<OrderItem?> GetOrderItemAsync(Guid id);
     Task<IEnumerable<OrderItem>> GetAllOrderItemsAsync();
+    Task AddOrderItemsRangeAsync(IEnumerable<OrderItem> items);
 }

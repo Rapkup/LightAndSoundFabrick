@@ -1,4 +1,5 @@
-﻿using SemataryFabrick.Domain.Entities.Models.Items;
+﻿using SemataryFabrick.Domain.Entities.Models.CartModels;
+using SemataryFabrick.Domain.Entities.Models.Items;
 
 namespace SemataryFabrick.Domain.Entities.Models;
 
@@ -9,5 +10,4 @@ public class Discount
     public string Description { get; set; }
     public int DiscountPercent { get; set; }
 
-    public IEnumerable<Item> Items { get; set; }
 }

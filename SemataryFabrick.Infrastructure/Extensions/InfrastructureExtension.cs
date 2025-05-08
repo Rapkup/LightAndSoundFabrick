@@ -12,8 +12,9 @@ public static class InfrastructureExtension
     {
         services
             .AddDbContext(configuration)
+            .RunMigrationViaRuntime()
             .AddRepositories()
-        .AddDataSeeders();
+            .AddDataSeeders();
 
         await services.AddSeedDataForDevelopmentAsync();
     }
@@ -41,7 +42,18 @@ public static class InfrastructureExtension
 
         return services;
     }
+    private static IServiceCollection RunMigrationViaRuntime(this IServiceCollection services)
+    {
+        using var scope = services.BuildServiceProvider().CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
 
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+
+        return services;
+    }
     private static async Task AddSeedDataForDevelopmentAsync(this IServiceCollection services)
     {
         if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")

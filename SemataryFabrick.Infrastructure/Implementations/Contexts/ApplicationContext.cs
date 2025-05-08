@@ -45,14 +45,19 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         modelBuilder.Entity<CartItem>(e =>
         {
             e.HasKey(ci => ci.Id);
+            
             e.HasOne(ci => ci.Cart)
                 .WithMany(c => c.Items)
                 .HasForeignKey(ci => ci.CartId);
 
             e.HasOne(ci => ci.Product)
                 .WithMany(i => i.CartItems)
-
                 .HasForeignKey(ci => ci.ProductId);
+                
+            e.HasOne(ci => ci.Discount)
+                .WithMany()
+                .HasForeignKey(ci => ci.DiscountId)
+                .IsRequired(false); 
         });
         // Конфигурация OrderBase
         modelBuilder.Entity<OrderBase>(e =>
@@ -82,9 +87,10 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
                 .HasForeignKey(c => c.OrderBaseId);
         });
         // Конфигурация OrderItem
-        modelBuilder.Entity<OrderItem>(e =>
+          modelBuilder.Entity<OrderItem>(e =>
         {
             e.HasKey(oi => oi.Id);
+            
             e.HasOne(oi => oi.OrderBase)
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderBaseId);
@@ -92,6 +98,11 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
             e.HasOne(oi => oi.Product)
                 .WithMany(i => i.OrderItems)
                 .HasForeignKey(oi => oi.ProductId);
+                
+            e.HasOne(oi => oi.Discount)
+                .WithMany()
+                .HasForeignKey(oi => oi.DiscountId)
+                .IsRequired(false); 
         });
         // Конфигурация OrderCrew
         modelBuilder.Entity<OrderCrew>(e =>
@@ -132,17 +143,17 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
             e.Property(ic => ic.PassportIdNumber)
                 .HasMaxLength(50);
 
-            e.HasMany(ic => ic.OrderBases)
-                .WithOne(o => (IndividualCustomer)o.Customer)
-                .HasForeignKey(o => o.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //e.HasMany(ic => ic.OrderBases)
+            //    .WithOne(o => (IndividualCustomer)o.Customer)
+            //    .HasForeignKey(o => o.CustomerId)
+            //    .OnDelete(DeleteBehavior.Restrict);
         });
         modelBuilder.Entity<LegalCustomer>(e =>
         {
-            e.HasMany(lc => lc.OrderBases)
-                 .WithOne(o => (LegalCustomer)o.Customer)
-                 .HasForeignKey(o => o.CustomerId)
-                 .OnDelete(DeleteBehavior.Restrict);
+            //e.HasMany(lc => lc.OrderBases)
+            //     .WithOne(o => (LegalCustomer)o.Customer)
+            //     .HasForeignKey(o => o.CustomerId)
+            //     .OnDelete(DeleteBehavior.Restrict);
         });
         modelBuilder.Entity<OrderManager>(e =>
         {
@@ -171,12 +182,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         // Конфигурация Item
         modelBuilder.Entity<Item>(e =>
         {
-            e.HasKey(i => i.Id);      
-
-            e.HasOne(i => i.Discount)
-                .WithMany(d => d.Items)
-                .HasForeignKey(i => i.DiscountId)
-                .IsRequired(false);
+            e.HasKey(i => i.Id);
 
             e.HasOne(i => i.Inventory)
                 .WithMany(inv => inv.Items)
