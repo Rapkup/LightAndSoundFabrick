@@ -187,6 +187,12 @@ namespace SemataryFabrikUI.Pages
             return RedirectToPage();
         }
 
+        private async Task UpdateCartBadge()
+        {
+            var count = await _cartService.GetCartItemsCountAsync(GetUserId());
+            HttpContext.Session.SetInt32("CartItemsCount", count);
+        }
+
         private Guid GetUserId()
         {
             return Guid.Parse(HttpContext.Session.GetString("UserId"));
@@ -204,10 +210,5 @@ namespace SemataryFabrikUI.Pages
                 DateOnly.Parse(dateString);
         }
 
-        private async Task UpdateCartBadge()
-        {
-            var count = await _cartService.GetCartItemsCountAsync(GetUserId());
-            HttpContext.Session.SetInt32("CartItemsCount", count);
-        }
     }
 }
