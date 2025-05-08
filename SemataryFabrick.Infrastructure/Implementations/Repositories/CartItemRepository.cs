@@ -28,4 +28,10 @@ partial class CartItemRepository(ApplicationContext context) : RepositoryBase<Ca
                 .Include(ci => ci.Discount)
                 .FirstOrDefaultAsync();
     }
+
+    public async Task<CartItem?> GetCartItemByCartAndProductAsync(Guid cartId, Guid productId)
+    {
+        return await context.CartItems
+            .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
+    }
 }

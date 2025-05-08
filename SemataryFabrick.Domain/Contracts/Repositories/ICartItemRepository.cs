@@ -10,4 +10,5 @@ public interface ICartItemRepository
     Task<int> GetCartItemsCountByCartIdAsync(Guid cartId);
     Task<IEnumerable<CartItem>> GetAllCartItemsAsync();
     Task<CartItem?> GetCartItemWithProductAsync(Guid cartItemId);
+    Task<CartItem?> GetCartItemByCartAndProductAsync(Guid cartId, Guid productId);
 }

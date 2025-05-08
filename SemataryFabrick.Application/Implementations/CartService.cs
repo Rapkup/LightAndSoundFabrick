@@ -5,6 +5,7 @@ using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
+using SemataryFabrick.Domain.Entities.Models.Items;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 
 namespace SemataryFabrick.Application.Implementations;
@@ -173,5 +174,94 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         await repositoryManager.SaveAsync();
 
         logger.LogInformation("Cart {cartId} updated successfully", cartDto.Id);
+    }
+
+    public async Task<Cart> GetOrCreateCartAsync(Guid userId)
+    {
+        var cart = await repositoryManager.Cart.GetCartByUserIdAsync(userId);
+
+        if (cart == null)
+        {
+            cart = new Cart
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = userId,
+                Items = new List<CartItem>(),
+                TotalPrice = 0
+            };
+
+            await repositoryManager.Cart.AddCartAsync(cart);
+            await repositoryManager.SaveAsync();
+        }
+
+        return cart;
+    }
+
+    public async Task AddOrUpdateCartItemAsync(Guid userId, Guid productId, int quantity)
+    {
+        logger.LogInformation("Adding/Updating cart item for user {userId} and product {productId}",
+            userId, productId);
+
+        // 1. Получаем или создаем корзину
+        var cart = await GetOrCreateCartAsync(userId);
+
+        // 2. Проверяем существование продукта
+        var product = await repositoryManager.Item.GetItemAsync(productId);
+        if (product == null)
+        {
+            logger.LogError("Product {productId} not found", productId);
+            throw new EntityNotFoundException(nameof(Item), productId);
+        }
+
+        // 3. Ищем существующую позицию
+        var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+        if (existingItem != null)
+        {
+            // 4. Обновляем существующую позицию
+            existingItem.Quantity += quantity;
+            repositoryManager.CartItem.UpdateCartItem(existingItem);
+            logger.LogDebug("Updated existing item {itemId} in cart {cartId}",
+                existingItem.Id, cart.Id);
+        }
+        else
+        {
+            // 5. Создаем новую позицию
+            var newCartItem = new CartItem
+            {
+                Id = Guid.NewGuid(),
+                CartId = cart.Id,
+                ProductId = productId,
+                Quantity = quantity,
+                StartRentDate = null,
+                EndRentDate = null,
+            };
+
+            await repositoryManager.CartItem.AddCartItemAsync(newCartItem);
+            logger.LogDebug("Added new item {itemId} to cart {cartId}",
+                newCartItem.Id, cart.Id);
+        }
+
+        // 6. Пересчитываем общую стоимость
+        cart.TotalPrice = await CalculateCartTotal(cart.Id);
+        repositoryManager.Cart.UpdateCart(cart);
+
+        // 7. Сохраняем изменения
+        await repositoryManager.SaveAsync();
+        logger.LogInformation("Cart {cartId} updated successfully", cart.Id);
+    }
+
+    private async Task<decimal> CalculateCartTotal(Guid cartId)
+    {
+        var cartWithItems = await repositoryManager.Cart.GetCartWithRelatedItemsByIdAsync(cartId);
+        return cartWithItems.Items.Sum(item =>
+        {
+            var price = item.Product.Price;
+            if (item.Discount != null)
+            {
+                price *= (1 - item.Discount.DiscountPercent / 100m);
+            }
+            return price * item.Quantity;
+        });
     }
 }

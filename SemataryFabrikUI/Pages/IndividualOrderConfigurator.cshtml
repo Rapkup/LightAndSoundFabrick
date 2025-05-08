@@ -1,4 +1,244 @@
 ﻿@page
-@model SemataryFabrikUI.Pages.IndividualOrderConfiguratorModel
+@model IndividualOrderConfiguratorModel
 @{
+    ViewData["Title"] = "Конфигуратор заказа";
 }
+
+
+@section Styles {
+    <style>
+        .form-check-input:checked + .form-check-label {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .card-img-top {
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+
+        .sticky-top {
+            top: 20px;
+        }
+    </style>
+}
+<div class="progress mb-4">
+    <div class="progress-bar" role="progressbar"
+         style="width: @(Model.State.CurrentStep * 25)%">
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Основные шаги -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    @if (Model.State.CurrentStep == 1)
+                    {
+                        <h3 class="mb-4">Шаг 1: Выбор категорий</h3>
+                        <form method="post">
+                            <div class="row">
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check card p-3">
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="cat-@cat.Id"
+                                                   name="selectedCategoryIds"
+                                                   value="@cat.Id"
+                                                   checked="@Model.State.SelectedCategoryIds.Contains(cat.Id)">
+                                            <label class="form-check-label h5" for="cat-@cat.Id">
+                                                @cat.Name
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <button type="submit" class="btn btn-primary" asp-page-handler="SelectCategories">Далее →</button>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 2)
+                    {
+                        <h3 class="mb-4">Шаг 2: Выбор подкатегорий</h3>
+                        <form method="post">
+                            <div class="row">
+                                @foreach (var sub in Model.SubCategories)
+                                {
+                                    <div class="col-md-4 mb-3">
+                                        <div class="form-check card p-2">
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="sub-@sub.Id"
+                                                   name="selectedSubCategoryIds"
+                                                   value="@sub.Id"
+                                                   checked="@Model.State.SelectedSubCategoryIds.Contains(sub.Id)">
+                                            <label class="form-check-label" for="sub-@sub.Id">
+                                                @sub.Name
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="1">
+                                    ← Назад
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        asp-page-handler="SelectSubcategories">
+                                    Далее →
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 3)
+                    {
+                        <h3 class="mb-4">Шаг 3: Выбор даты</h3>
+                        <form method="post">
+                            <div class="form-group">
+                                <label>Дата мероприятия:</label>
+                                <input type="date" class="form-control"
+                                       name="eventDate"
+                                       value="@Model.State.EventDate.ToString("yyyy-MM-dd")"
+                                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="2">
+                                    ← Назад
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        asp-page-handler="SetDate">
+                                    Далее →
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 4)
+                    {
+                        <h3 class="mb-4">Шаг 4: Выбор товаров</h3>
+                        <div class="row">
+                            @foreach (var item in Model.Items)
+                            {
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <img src="/images/items/@item.ImageName"
+                                             class="card-img-top"
+                                             alt="@item.Name"
+                                             style="height: 200px; object-fit: cover;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@item.Name</h5>
+                                            <button type="button" class="btn btn-info btn-sm"
+                                                    data-toggle="modal"
+                                                    data-target="#itemModal-@item.Id">
+                                                Подробнее
+                                            </button>
+                                        </div>
+                                        <div class="card-footer">
+                                            <form method="post">
+                                                <div class="input-group">
+                                                    <input type="number"
+                                                           class="form-control"
+                                                           value="@Model.State.CartItems.GetValueOrDefault(item.Id, 1)"
+                                                           min="1"
+                                                           name="quantity">
+                                                    <div class="input-group-append">
+                                                        <button type="submit"
+                                                                class="btn btn-primary"
+                                                                asp-page-handler="AddItem"
+                                                                asp-route-itemId="@item.Id">
+                                                            Добавить
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Модальное окно -->
+                                <div class="modal fade" id="itemModal-@item.Id" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">@item.Name</h5>
+                                                <button type="button" class="close" data-dismiss="modal">
+                                                    <span>&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <img src="/images/items/@item.ImageName"
+                                                     class="img-fluid mb-3"
+                                                     alt="@item.Name">
+                                                <p>@item.Description</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <form method="post">
+                                <button type="submit"
+                                        class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="3">
+                                    ← Назад
+                                </button>
+                            </form>
+                            <form method="post">
+                                <button type="submit"
+                                        class="btn btn-success"
+                                        asp-page-handler="Complete">
+                                    Завершить конфигурацию
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Боковая панель корзины -->
+        <div class="col-md-4">
+            <div class="card sticky-top">
+                <div class="card-header">
+                    <h5 class="mb-0">Ваш заказ</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.State.CurrentStep >= 4 && Model.State.CartItems.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var (itemId, qty) in Model.State.CartItems)
+                            {
+                                var item = Model.Items.FirstOrDefault(i => i.Id == itemId);
+                                if (item != null)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        @item.Name
+                                        <div>
+                                            <span class="badge badge-primary badge-pill">@qty</span>
+                                            <form method="post" class="d-inline">
+                                                <button type="submit"
+                                                        class="btn btn-danger btn-sm"
+                                                        asp-page-handler="RemoveItem"
+                                                        asp-route-itemId="@itemId">
+                                                    ×
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Корзина пуста</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

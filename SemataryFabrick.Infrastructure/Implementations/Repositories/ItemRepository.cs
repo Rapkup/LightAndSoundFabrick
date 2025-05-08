@@ -17,4 +17,18 @@ public class ItemRepository(ApplicationContext context) : RepositoryBase<Item>(c
 
     public async Task<Item?> GetItemAsync(Guid id)
         => await Find(ci => ci.Id == id).FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<Item>> GetItemsBySubCategoriesAsync(IEnumerable<Guid> subCategoryIds)
+    {
+        return await context.Items
+            .Where(i => subCategoryIds.Contains(i.SubCategoryId))
+            .Include(i => i.SubCategory)
+            .ToListAsync();
+    }
+
+    public async Task<Item> GetItemBySubCategoryAsync(Guid subCategoryId)
+    {
+        return await Find(i => i.SubCategoryId == subCategoryId)
+            .FirstAsync();
+    }
 }

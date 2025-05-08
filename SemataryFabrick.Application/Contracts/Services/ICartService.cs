@@ -11,8 +11,10 @@ public interface ICartService
     Task<int> GetCartItemsCountAsync(Guid userId);
 
     Task<IEnumerable<CartItemToDisplayDto>?> GetCartItemsToDisplayByUserIdAsync(Guid userId);
-    Task DeleteCartAsync(Guid userId);
     Task<CartDto> GetCartByUserIdAsync(Guid userId);
+    Task<Cart> GetOrCreateCartAsync(Guid userId);
     Task PlaceAnOrder(CartDto cartDto);
+    Task DeleteCartAsync(Guid userId);
     Task UpdateCartAsync(CartDto cartDto);
+    Task AddOrUpdateCartItemAsync(Guid userId, Guid productId, int quantity);
 }
