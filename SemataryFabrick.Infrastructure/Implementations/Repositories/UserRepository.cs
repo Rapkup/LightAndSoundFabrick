@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SemataryFabrick.Domain.Contracts.Repositories;
+using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 using SemataryFabrick.Infrastructure.Implementations.Contexts;
 
@@ -31,5 +32,13 @@ public class UserRepository(ApplicationContext context) : IUserRepository
             return true;
 
         return false;
+    }
+
+    public async Task<ApplicationUser?> GetRandomByTypeAsync(UserType userType)
+    {
+        return await context.Users
+            .Where(u => u.UserType == userType)
+            .OrderBy(_ => Guid.NewGuid())
+            .FirstOrDefaultAsync();
     }
 }

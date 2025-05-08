@@ -76,13 +76,13 @@
                                     </li>
                                     <li class="header-get-a-quote">
                                         @if (Context.Session.GetString("IsLoggedIn") == "true" &&
-                                            (Context.Session.GetString("UserType") == INDIVIDUAL ||
-                                             Context.Session.GetString("UserType") == LEGAL))
+                                        (Context.Session.GetString("UserType") == INDIVIDUAL ||
+                                        Context.Session.GetString("UserType") == LEGAL))
                                         {
                                             <div class="btn-group" role="group">
                                                 <a class="btn btn-primary mr-2" asp-page="/Cart">
                                                     <i class="fa fa-shopping-cart"></i>
-                                                    <span class="badge badge-pill badge-danger"></span>
+                                                    @await Component.InvokeAsync("CartBadge")
                                                 </a>
                                                 <a class="btn btn-primary mr-2" asp-page="/Account/Personal">Личный кайнет</a>
                                                 <form class="d-inline" asp-page="/Authorization/Logout" method="post">
@@ -124,7 +124,7 @@
                                         <li class="nav-item dropdown">
                                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Техническое обеспечение<i class="fa fa-angle-down"></i></a>
                                             <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Собрать заказ</a></li>
+                                                <li><a asp-page="/IndividualOrderConfigurator">Собрать заказ</a></li>
                                                 <li><a asp-page="/TechSupportInfo">Инфо</a></li>
                                             </ul>
                                         </li>
@@ -235,6 +235,7 @@
         <script src="js/script.js"></script>
 
     </div><!-- Body inner end -->
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>

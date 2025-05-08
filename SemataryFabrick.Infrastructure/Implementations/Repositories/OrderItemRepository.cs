@@ -17,4 +17,7 @@ public class OrderItemRepository(ApplicationContext context) : RepositoryBase<Or
 
     public async Task<OrderItem?> GetOrderItemAsync(Guid id)
         => await Find(ci => ci.Id == id).FirstOrDefaultAsync();
+
+    public async Task AddOrderItemsRangeAsync(IEnumerable<OrderItem> items) 
+        => await AddRangeAsync(items);
 }

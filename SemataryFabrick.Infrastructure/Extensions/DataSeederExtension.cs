@@ -8,6 +8,7 @@ using SemataryFabrick.Domain.Entities.Models;
 using SemataryFabrick.Infrastructure.Implementations.Contexts;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using Microsoft.EntityFrameworkCore;
+using SemataryFabrick.Domain.Entities.Models.CartModels;
 
 namespace SemataryFabrick.Infrastructure.Extensions;
 
@@ -21,7 +22,7 @@ public class DataSeederExtension(ApplicationContext context)
         await SeedSubCategories();
         await SeedItems();
         await SeedOrdersWithRelatedData();
-        // await SeedCartsWithItems(); 
+        await SeedCartsWithItems();
     }
 
     private async Task SeedUsers()
@@ -359,7 +360,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "JBL SRX835P",
                 "Активная трехполосная полнодиапазонная система",
-                25000,
+                1000,
                 speakersSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -372,7 +373,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Yamaha DXR12",
                 "Активная двухполосная полнодиапазонная система",
-                18000,
+                700,
                 speakersSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -391,7 +392,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Shure SM58",
                 "Динамический вокальный микрофон",
-                5000,
+                70,
                 micsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -404,7 +405,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Sennheiser e935",
                 "Динамический вокальный микрофон",
-                6500,
+                80,
                 micsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -421,7 +422,7 @@ public class DataSeederExtension(ApplicationContext context)
         items.Add(CreateItem(
             "Behringer Eurolive B112D",
             "Активный сценический монитор",
-            12000,
+            400,
             monitorsSubCat.Id,
             new Dictionary<string, string>
             {
@@ -439,7 +440,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "K&M 210-9",
                 "Стойка для микрофона",
-                1500,
+                50,
                 standsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -452,7 +453,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "K&M 25950",
                 "Стойка для колонок",
-                3000,
+                1200,
                 standsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -471,7 +472,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Eurolite LED ST-1000",
                 "Светодиодный стробоскоп",
-                8000,
+                720,
                 strobeSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -484,7 +485,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Martin Atomic 3000",
                 "Газоразрядный стробоскоп",
-                15000,
+                600,
                 strobeSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -503,7 +504,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Chauvet Intimidator Spot 355",
                 "Моторизированный прожектор",
-                25000,
+                1000,
                 movingHeadsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -516,7 +517,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Martin MAC Aura",
                 "Моторизированный прожектор",
-                35000,
+                1400,
                 movingHeadsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -535,7 +536,7 @@ public class DataSeederExtension(ApplicationContext context)
             CreateItem(
                 "Chauvet COLORband PiX",
                 "Светодиодная панель малая",
-                12000,
+                440,
                 ledPanelsSubCat.Id,
                 new Dictionary<string, string>
                 {
@@ -548,7 +549,7 @@ public class DataSeederExtension(ApplicationContext context)
                     CreateItem(
                         "Eurolite LED BAR-12",
                         "Светодиодная панель большая",
-                        18000,
+                        680,
                         ledPanelsSubCat.Id,
                         new Dictionary<string, string>
                         {
@@ -567,7 +568,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Look Solutions Unique Hazer",
         "Генератор дыма",
-        25000,
+        200,
         effectGenSubCat.Id,
         new Dictionary<string, string>
         {
@@ -579,7 +580,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Antari F-80",
         "Генератор тумана",
-        18000,
+        200,
         effectGenSubCat.Id,
         new Dictionary<string, string>
         {
@@ -591,7 +592,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "MDG Atmosphere",
         "Вентилятор с эффектом ветра",
-        32000,
+        150,
         effectGenSubCat.Id,
         new Dictionary<string, string>
         {
@@ -607,7 +608,7 @@ public class DataSeederExtension(ApplicationContext context)
         items.Add(CreateItem(
             "Absen PL2.5",
             "Светодиодный экран 2.5mm pitch",
-            150000,
+            100,
             ledScreensSubCat.Id,
             new Dictionary<string, string>
             {
@@ -625,7 +626,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Global Truss ST-132",
         "Подиум 1x1 м",
-        8000,
+        36,
         podiumsSubCat.Id,
         new Dictionary<string, string>
         {
@@ -637,7 +638,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Prolyte S30",
         "Подиум 2x1 м",
-        12000,
+        48,
         podiumsSubCat.Id,
         new Dictionary<string, string>
         {
@@ -655,7 +656,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Truss Tower 2m",
         "Тотемная стойка 2 метра",
-        7000,
+        28,
         totemSubCat.Id,
         new Dictionary<string, string>
         {
@@ -667,7 +668,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Truss Tower 1m",
         "Тотемная стойка 1 метр",
-        5000,
+        20,
         totemSubCat.Id,
         new Dictionary<string, string>
         {
@@ -685,7 +686,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Mountain 6x4",
         "Сценический комплекс средний",
-        50000,
+        4000,
         stageComplexSubCat.Id,
         new Dictionary<string, string>
         {
@@ -697,7 +698,7 @@ public class DataSeederExtension(ApplicationContext context)
     CreateItem(
         "Mountain 4x3",
         "Сценический комплекс малый",
-        35000,
+        2000,
         stageComplexSubCat.Id,
         new Dictionary<string, string>
         {
@@ -708,15 +709,14 @@ public class DataSeederExtension(ApplicationContext context)
         })
 });
 
-        // Создаем инвентарь с фиксированным количеством 30 для каждого товара
         var inventories = items.Select(item => new ItemInventory
         {
             Id = Guid.NewGuid(),
-            Quantity = 30, // Фиксированное количество
+            Quantity = 30, 
             Items = new List<Item> { item }
         }).ToList();
 
-        // Связываем товары с инвентарем
+        
         foreach (var (item, inventory) in items.Zip(inventories))
         {
             item.InventoryId = inventory.Id;
@@ -726,30 +726,109 @@ public class DataSeederExtension(ApplicationContext context)
         await context.Items.AddRangeAsync(items);
         await context.SaveChangesAsync();
     }
+
     private async Task SeedOrdersWithRelatedData()
     {
         var users = await context.Users.ToListAsync();
         var items = await context.Items.ToListAsync();
+        var discounts = await context.Discounts.ToListAsync();
         var workers = users.OfType<Worker>().ToList();
 
-        // Создаем заказы для Individual и Legal клиентов
         var individualOrder = await CreateOrder(
             users.OfType<IndividualCustomer>().First(),
             users.OfType<OrderManager>().First(),
             users.OfType<TechOrderLead>().First(),
             items.Take(3).ToList(),
-            workers);
+            workers,
+            discounts);
 
         var legalOrder = await CreateOrder(
             users.OfType<LegalCustomer>().First(),
             users.OfType<OrderManager>().First(),
             users.OfType<TechOrderLead>().Last(),
             items.Skip(3).Take(4).ToList(),
-            workers);
+            workers,
+            discounts); 
 
         await context.SaveChangesAsync();
     }
 
+    private async Task SeedCartsWithItems()
+    {
+        var customers = await context.Users
+            .OfType<IndividualCustomer>()
+            .OrderBy(u => u.UserName)
+            .Take(2)
+            .ToListAsync();
+
+        var items = await context.Items.ToListAsync();
+        var discounts = await context.Discounts.ToListAsync();
+        var rentCustomer = customers[0];
+        var rentItems = items.Take(3).ToList();
+
+        var rentCart = new Cart
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = rentCustomer.Id,
+            EventDate = null,
+            Items = rentItems.Select((item, index) => new CartItem
+            {
+                Id = Guid.NewGuid(),
+                ProductId = item.Id,
+                Quantity = 1,
+                StartRentDate = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
+                EndRentDate = DateOnly.FromDateTime(DateTime.Now.AddDays(5)),
+                DiscountId = index == 0 ? discounts[0].Id : null
+            }).ToList()
+        };
+
+        var rentDays = (rentCart.Items.First().EndRentDate.Value.ToDateTime(TimeOnly.MinValue)
+                      - rentCart.Items.First().StartRentDate.Value.ToDateTime(TimeOnly.MinValue))
+                      .Days;
+
+        rentCart.TotalPrice = rentCart.Items.Sum(ci =>
+        {
+            var itemPrice = items.First(i => i.Id == ci.ProductId).Price;
+            var discount = discounts.FirstOrDefault(d => d.Id == ci.DiscountId);
+            if (discount != null)
+            {
+                itemPrice *= (1 - discount.DiscountPercent / 100m);
+            }
+            return itemPrice * ci.Quantity * rentDays;
+        });
+
+        var eventCustomer = customers[1];
+        var orderItems = items.Skip(3).Take(2).ToList();
+        var eventCart = new Cart
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = eventCustomer.Id,
+            EventDate = DateOnly.FromDateTime(DateTime.Now.AddDays(10)),
+            Items = orderItems.Select((item, index) => new CartItem
+            {
+                Id = Guid.NewGuid(),
+                ProductId = item.Id,
+                Quantity = 2,
+                StartRentDate = null,
+                EndRentDate = null,
+                DiscountId = index == 1 ? discounts[1].Id : null
+            }).ToList()
+        };
+        eventCart.TotalPrice = eventCart.Items.Sum(ci =>
+        {
+            var itemPrice = items.First(i => i.Id == ci.ProductId).Price;
+            var discount = discounts.FirstOrDefault(d => d.Id == ci.DiscountId);
+            if (discount != null)
+            {
+                itemPrice *= (1 - discount.DiscountPercent / 100m);
+            }
+            return itemPrice * ci.Quantity;
+        });
+
+        await context.Carts.AddRangeAsync(rentCart, eventCart);
+        await context.SaveChangesAsync();
+    }
+    
     private Item CreateItem(string name, string description, decimal price, Guid subCategoryId, Dictionary<string, string> parameters)
     {
         return new Item
@@ -764,7 +843,10 @@ public class DataSeederExtension(ApplicationContext context)
         };
     }
 
-    private async Task<OrderBase> CreateOrder(ApplicationUser customer, OrderManager manager, TechOrderLead techLead, List<Item> items, List<Worker> workers)
+    private async Task<OrderBase> CreateOrder(ApplicationUser customer, OrderManager manager, TechOrderLead techLead,
+        List<Item> items,
+        List<Worker> workers,
+        List<Discount> discounts)
     {
         var order = new OrderBase
         {
@@ -780,20 +862,33 @@ public class DataSeederExtension(ApplicationContext context)
             {
                 Id = Guid.NewGuid(),
                 Quantity = index + 1,
-                ProductId = item.Id
+                ProductId = item.Id,
+                DiscountId = index % 2 == 0 ? discounts[1].Id : null // Применяем вторую скидку к каждому четному элементу
             }).ToList(),
             OrderCrews = new List<OrderCrew>
+        {
+            new()
             {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    WorkDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7)),
-                    TechLeadId = techLead.Id,
-                    Workers = workers.Take(2).ToList(),
-                    WorkTaskAssignments = CreateWorkTasks()
-                }
+                Id = Guid.NewGuid(),
+                WorkDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7)),
+                TechLeadId = techLead.Id,
+                Workers = workers.Take(2).ToList(),
+                WorkTaskAssignments = CreateWorkTasks()
             }
+        }
         };
+
+        // Пересчет суммы с учетом скидок
+        order.TotalPrice = order.OrderItems.Sum(oi =>
+        {
+            var itemPrice = items.First(i => i.Id == oi.ProductId).Price;
+            var discount = discounts.FirstOrDefault(d => d.Id == oi.DiscountId);
+            if (discount != null)
+            {
+                itemPrice *= (1 - discount.DiscountPercent / 100m);
+            }
+            return itemPrice * oi.Quantity;
+        });
 
         await context.Orders.AddAsync(order);
         return order;

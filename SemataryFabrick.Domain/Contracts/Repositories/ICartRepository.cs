@@ -7,5 +7,8 @@ public interface ICartRepository
     void UpdateCart(Cart cart);
     Task AddCartAsync(Cart cart);
     Task<Cart?> GetCartAsync(Guid id);
+    Task<Cart?> GetCartByUserIdAsync(Guid userId);
+    Task<Cart?> GetCartWithRelatedItemsByIdAsync(Guid cartId);
+    Task<Cart?> GetCartWithRelatedItemsAndProductsByUserIdAsync(Guid userId);
     Task<IEnumerable<Cart>> GetAllCartsAsync();
 }
