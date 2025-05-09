@@ -19,6 +19,17 @@
         .sticky-top {
             top: 20px;
         }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #6c757d !important;
+        }
+
+        .price-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #28a745;
+        }
     </style>
 }
 <div class="progress mb-4">
@@ -128,6 +139,11 @@
                                              style="height: 200px; object-fit: cover;">
                                         <div class="card-body">
                                             <h5 class="card-title">@item.Name</h5>
+                                            @{
+                                                var subCategory = Model.SubCategories.FirstOrDefault(s => s.Id == item.SubCategoryId);
+                                            }
+                                            <p class="text-muted small mb-2">@subCategory?.Name</p>
+                                            <p class="card-text">Цена: @item.Price.ToString("C")</p>
                                             <button type="button" class="btn btn-info btn-sm"
                                                     data-toggle="modal"
                                                     data-target="#itemModal-@item.Id">
@@ -199,39 +215,77 @@
             </div>
         </div>
 
+        <!-- Модальное окно авторизации -->
+        <div class="modal fade" id="authModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Требуется авторизация</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Для завершения заказа необходимо авторизоваться. Все товары в корзине будут сохранены.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary"
+                           href="/Authorization/Login?returnUrl=@Url.Page("/IndividualOrderConfigurator")">
+                            Войти
+                        </a>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Продолжить покупки</button>
+                        <form method="post">
+                            <button type="submit" class="btn btn-danger" asp-page-handler="ResetCart">
+                                Сбросить корзину
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Боковая панель корзины -->
         <div class="col-md-4">
             <div class="card sticky-top">
-                <div class="card-header">
-                    <h5 class="mb-0">Ваш заказ</h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ваша корзина</h5>
+                    <span class="badge badge-primary">@Model.State.CartItems.Sum(x => x.Value)</span>
                 </div>
                 <div class="card-body">
-                    @if (Model.State.CurrentStep >= 4 && Model.State.CartItems.Any())
+                    @if (Model.State.CartItems.Any())
                     {
-                        <ul class="list-group">
+                        <ul class="list-group mb-3">
                             @foreach (var (itemId, qty) in Model.State.CartItems)
                             {
-                                var item = Model.Items.FirstOrDefault(i => i.Id == itemId);
-                                if (item != null)
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        @item.Name
-                                        <div>
-                                            <span class="badge badge-primary badge-pill">@qty</span>
-                                            <form method="post" class="d-inline">
-                                                <button type="submit"
-                                                        class="btn btn-danger btn-sm"
-                                                        asp-page-handler="RemoveItem"
-                                                        asp-route-itemId="@itemId">
-                                                    ×
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </li>
-                                }
+                                var item = Model.Items?.FirstOrDefault(i => i.Id == itemId);
+                                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                    <div>
+                                        <h6 class="my-0">@item?.Name</h6>
+                                        <small class="text-muted">@item?.Price.ToString("C") x @qty</small>
+                                    </div>
+                                    <span class="text-muted">@((item?.Price * qty)?.ToString("C"))</span>
+                                    <form method="post">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                asp-page-handler="RemoveItem"
+                                                asp-route-itemId="@itemId">
+                                            ×
+                                        </button>
+                                    </form>
+                                </li>
                             }
                         </ul>
+                        <div class="d-flex justify-content-between">
+                            <span>Итого:</span>
+                            <strong>@Model.CartTotal.ToString("C")</strong>
+                        </div>
+                        <form method="post">
+                            <button type="submit"
+                                    class="btn btn-success btn-block mt-3"
+                                    asp-page-handler="Complete">
+                                Оформить заказ
+                            </button>
+                        </form>
                     }
                     else
                     {
@@ -242,3 +296,14 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+                $(document).ready(function() {
+        @if (TempData["ShowAuthModal"] as bool? == true)
+        {
+            <text>$('#authModal').modal('show');</text>
+        }
+        });
+    </script>
+}

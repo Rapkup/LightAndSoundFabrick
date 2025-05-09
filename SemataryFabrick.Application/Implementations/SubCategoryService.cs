@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs;
+using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Models;
 
@@ -9,15 +10,26 @@ public class SubCategoryService(IRepositoryManager repositoryManager, ILogger<Su
 {
     public async Task<IEnumerable<SubCategoryDto>> GetSubCategoriesByParentIdsAsync(IEnumerable<Guid> parentIds)
     {
-        try
+        var subCategories = await repositoryManager.SubCategory.GetSubCategoriesByParentIdsAsync(parentIds);
+        return subCategories.Select(SubCategoryDto.FromEntity).ToList();
+    }
+
+    public async Task<IEnumerable<SubCategoryDto>> GetSubCategoriesByIdsAsync(IEnumerable<Guid> subCategoryIds)
+    {
+        var subCategories = new List<SubCategoryDto>();
+
+        foreach (var subCategoryId in subCategoryIds)
         {
-            var subCategories = await repositoryManager.SubCategory.GetSubCategoriesByParentIdsAsync(parentIds);
-            return subCategories.Select(SubCategoryDto.FromEntity).ToList();
+            var subCategory = await repositoryManager.SubCategory.GetSubCategoryAsync(subCategoryId);
+
+            if (subCategory == null)
+            {
+                throw new EntityNotFoundException(nameof(SubCategory), subCategoryId);
+            }
+
+            subCategories.Add(SubCategoryDto.FromEntity(subCategory));
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error retrieving subCategories");
-            return Enumerable.Empty<SubCategoryDto>();
-        }
+
+        return subCategories;
     }
 }

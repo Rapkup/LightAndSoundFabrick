@@ -20,6 +20,8 @@ namespace SemataryFabrikUI.Pages
         public IEnumerable<SubCategoryDto> SubCategories { get; private set; }
         public IEnumerable<ItemDto> Items { get; private set; }
 
+        public decimal CartTotal => CalculateCartTotal();
+
         public IndividualOrderConfiguratorModel(
             IProductCategoryService productCategoryService,
             ISubCategoryService subCategoryService,
@@ -36,6 +38,12 @@ namespace SemataryFabrikUI.Pages
         {
             await InitializeState();
             await LoadDataBasedOnStep();
+
+            /* if (State.CartItems.Any())
+                 await LoadItemsForCart();*/
+
+            //Тут подгружаются товары по не существующим cartItemId
+
             return Page();
         }
 
@@ -62,7 +70,6 @@ namespace SemataryFabrikUI.Pages
 
             if (targetStep < 2) State.SelectedSubCategoryIds.Clear();
             if (targetStep < 3) State.EventDate = default;
-            //if (targetStep < 4) State.CartItems.Clear();
 
             State.CurrentStep = targetStep;
             SaveState();
@@ -109,7 +116,7 @@ namespace SemataryFabrikUI.Pages
 
             if (quantity > 0)
                 State.CartItems[itemId] = quantity;
-            
+
             SaveState();
             return RedirectToPage();
         }
@@ -127,7 +134,11 @@ namespace SemataryFabrikUI.Pages
             await InitializeState();
 
             if (HttpContext.Session.GetString("IsLoggedIn") != "true")
-                return RedirectToPage("/Authorization/Login", new { returnUrl = Url.Page("/IndividualOrderConfigurator") });
+            {
+                TempData["ShowAuthModal"] = true;
+                SaveState();
+                return RedirectToPage();
+            }
 
             var userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
             var cart = await _cartService.GetOrCreateCartAsync(userId);
@@ -160,19 +171,49 @@ namespace SemataryFabrikUI.Pages
                 await LoadItems();
         }
 
-        private async Task LoadCategories() => 
+        private async Task LoadCategories() =>
             Categories = await _productCategoryService.GetAllProductCategoriesAsync() ?? new List<ProductCategoryDto>();
 
         private async Task LoadSubCategories()
         {
-            if (State.SelectedCategoryIds?.Count > 0)
-                SubCategories = await _subCategoryService.GetSubCategoriesByParentIdsAsync(State.SelectedCategoryIds);
+            if (State.CurrentStep == 2)
+            {
+                if (State.SelectedCategoryIds?.Count > 0)
+                    SubCategories = await _subCategoryService.GetSubCategoriesByParentIdsAsync(State.SelectedCategoryIds);
+            }
+            else if (State.CurrentStep >= 4)
+            {
+                if (State.SelectedSubCategoryIds?.Count > 0)
+                    SubCategories = await _subCategoryService.GetSubCategoriesByIdsAsync(State.SelectedSubCategoryIds);
+            }
         }
-
         private async Task LoadItems()
         {
             if (State.SelectedSubCategoryIds?.Count > 0)
                 Items = await _itemService.GetItemsBySubCategoriesAsync(State.SelectedSubCategoryIds);
+        }
+
+        public async Task<IActionResult> OnPostResetCart()
+        {
+            HttpContext.Session.Remove("ConfiguratorState");
+            return RedirectToPage();
+        }
+
+        private decimal CalculateCartTotal()
+        {
+            decimal total = 0;
+            foreach (var (itemId, qty) in State.CartItems)
+            {
+                var item = Items?.FirstOrDefault(i => i.Id == itemId);
+                if (item != null) total += item.Price * qty;
+            }
+            return total;
+        }
+
+        private async Task LoadItemsForCart()
+        {
+            var cartItemIds = State.CartItems.Keys;
+            Items = await _itemService.GetItemsByCartItemIds(cartItemIds.ToList());
         }
     }
 
@@ -183,5 +224,6 @@ namespace SemataryFabrikUI.Pages
         public List<Guid> SelectedSubCategoryIds { get; set; } = new();
         public DateOnly EventDate { get; set; }
         public Dictionary<Guid, int> CartItems { get; set; } = new();
+        public Dictionary<Guid, ItemDto> LoadedItems { get; set; } = new();
     }
 }
