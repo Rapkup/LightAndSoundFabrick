@@ -1,7 +1,7 @@
 ﻿using SemataryFabrick.Domain.Entities.Enums;
 
 namespace SemataryFabrick.Application.Entities.DTOs.ProductItemDtos;
-public record ItemDtos
+public record ItemDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

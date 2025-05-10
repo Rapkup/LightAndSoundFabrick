@@ -8,7 +8,7 @@ public record CartDto
     public Guid CustomerId { get; set; }
     public DateOnly? EventDate { get; set; }
 
-    public static CartDto CartToCartDto(Cart cart)
+    public static CartDto FromEntity(Cart cart)
     {
         return new CartDto
         {
@@ -16,6 +16,17 @@ public record CartDto
             TotalPrice = cart.TotalPrice,
             CustomerId = cart.CustomerId,
             EventDate = cart.EventDate
+        };
+    }
+
+    public Cart ToEntity()
+    {
+        return new Cart
+        {
+            Id = this.Id,
+            TotalPrice = this.TotalPrice,
+            CustomerId = this.CustomerId,
+            EventDate = this.EventDate
         };
     }
 }

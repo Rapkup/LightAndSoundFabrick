@@ -17,4 +17,12 @@ public class OrderBaseRepository(ApplicationContext context) : RepositoryBase<Or
 
     public async Task<OrderBase?> GetOrderBaseAsync(Guid id)
         => await Find(ci => ci.Id == id).FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<OrderBase>?> GetOrdersBaseWithRelatedItemsByUserId(Guid userId)
+        => await context.Orders
+        .Where(o => o.CustomerId == userId)
+        .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+        .ToListAsync();
+
 }

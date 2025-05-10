@@ -1,0 +1,100 @@
+﻿@page
+@using SemataryFabrick.Domain.Entities.Models.UserModels
+@model AccountModel
+@{
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<div class="container mt-5">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab">Профиль</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="history-tab" data-toggle="tab" href="#history" role="tab">История заказов</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="unpaid-tab" data-toggle="tab" href="#unpaid" role="tab">Требуют оплаты</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="active-tab" data-toggle="tab" href="#active" role="tab">Активные заказы</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="confirmation-tab" data-toggle="tab" href="#confirmation" role="tab">Ожидают подтверждения</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <!-- Profile Tab -->
+        <div class="tab-pane fade show active" id="profile" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.CurrentUser is LegalCustomer legal)
+                    {
+                        <h5 class="card-title">Юридическое лицо</h5>
+                        <p>Компания: @legal.CompanyName</p>
+                        <p>ИНН: @legal.TaxIdNumber</p>
+                        <p>Контактное лицо: @legal.ContactPersonFullName</p>
+                    }
+                    else if (Model.CurrentUser is IndividualCustomer individual)
+                    {
+                        <h5 class="card-title">Физическое лицо</h5>
+                        <p>Паспорт: @individual.PassportIdNumber</p>
+                    }
+                    <p>Email: @Model.CurrentUser.Email</p>
+                    <p>Телефон: @Model.CurrentUser.PhoneNumber</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order History Tab -->
+        <div class="tab-pane fade" id="history" role="tabpanel">
+            @await Html.PartialAsync("_OrdersPartial", Model.DoneOrders)
+        </div>
+
+        <!-- Unpaid Orders Tab -->
+        <div class="tab-pane fade" id="unpaid" role="tabpanel">
+            @await Html.PartialAsync("_OrdersPartial", Model.UnpaidOrders)
+        </div>
+
+        <!-- Active Orders Tab -->
+        <div class="tab-pane fade" id="active" role="tabpanel">
+            @await Html.PartialAsync("_OrdersPartial", Model.ActiveOrders)
+        </div>
+
+        <!-- Payment Confirmation Tab -->
+        <div class="tab-pane fade" id="confirmation" role="tabpanel">
+            @await Html.PartialAsync("_OrdersPartial", Model.PendingConfirmationOrders)
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Детали заказа</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showOrderDetails(orderId) {
+            fetch(`/Account/OrderDetails?orderId=${orderId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('orderDetailsContent').innerHTML = html;
+                    $('#orderDetailsModal').modal('show');
+                });
+        }
+    </script>
+}

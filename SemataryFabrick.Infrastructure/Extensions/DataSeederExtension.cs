@@ -1,10 +1,8 @@
 ﻿using System.Text.Json;
-using SemataryFabrick.Domain.Entities;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.Items;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 using SemataryFabrick.Domain.Entities.Models;
-
 using SemataryFabrick.Infrastructure.Implementations.Contexts;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using Microsoft.EntityFrameworkCore;
@@ -712,11 +710,11 @@ public class DataSeederExtension(ApplicationContext context)
         var inventories = items.Select(item => new ItemInventory
         {
             Id = Guid.NewGuid(),
-            Quantity = 30, 
+            Quantity = 30,
             Items = new List<Item> { item }
         }).ToList();
 
-        
+
         foreach (var (item, inventory) in items.Zip(inventories))
         {
             item.InventoryId = inventory.Id;
@@ -748,7 +746,7 @@ public class DataSeederExtension(ApplicationContext context)
             users.OfType<TechOrderLead>().Last(),
             items.Skip(3).Take(4).ToList(),
             workers,
-            discounts); 
+            discounts);
 
         await context.SaveChangesAsync();
     }
@@ -828,7 +826,7 @@ public class DataSeederExtension(ApplicationContext context)
         await context.Carts.AddRangeAsync(rentCart, eventCart);
         await context.SaveChangesAsync();
     }
-    
+
     private Item CreateItem(string name, string description, decimal price, Guid subCategoryId, Dictionary<string, string> parameters)
     {
         return new Item
@@ -854,6 +852,7 @@ public class DataSeederExtension(ApplicationContext context)
             EventAddress = "ул. Центральная, 1",
             TotalPrice = items.Sum(i => i.Price),
             OrderType = OrderType.Rent,
+            OrderState = OrderState.Done,
             PaymentState = PaymentStatus.Paid,
             CustomerId = customer.Id,
             OrderManagerId = manager.Id,

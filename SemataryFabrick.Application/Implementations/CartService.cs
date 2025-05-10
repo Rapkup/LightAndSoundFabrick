@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.CartDtos;
+using SemataryFabrick.Application.Entities.DTOs.OrderDtos;
 using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
-using SemataryFabrick.Domain.Entities.Models.OrderModels;
 
 namespace SemataryFabrick.Application.Implementations;
 public class CartService(IRepositoryManager repositoryManager, ILogger<CartService> logger) : ICartService
@@ -69,12 +69,13 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
     {
         var cart = await repositoryManager.Cart.GetCartByUserIdAsync(userId);
 
+
         if (cart is null)
         {
             throw new EntityNotFoundException(nameof(Cart), "By userId: " + userId);
         }
 
-        return CartDto.CartToCartDto(cart);
+        return CartDto.FromEntity(cart);
     }
 
     public async Task DeleteCartAsync(Guid userId)
@@ -115,7 +116,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         var randomTechLead = await repositoryManager.User
             .GetRandomByTypeAsync(UserType.TechOrderLead);
 
-        var order = new OrderBase
+        var order = new OrderBaseDto
         {
             Id = Guid.NewGuid(),
             TotalPrice = cart.TotalPrice,
@@ -123,19 +124,20 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             StartRentDate = cart.Items.First().StartRentDate,
             EndRentDate = cart.Items.First().EndRentDate,
             OrderType = orderType,
+            OrderState = OrderState.Stock,
             PaymentState = PaymentStatus.Unpaid,
             CustomerId = cart.CustomerId,
             OrderManagerId = randomOrderManager.Id,
             TechOrderLeadId = randomTechLead.Id
         };
 
-        await repositoryManager.OrderBase.AddOrderBaseAsync(order);
+        await repositoryManager.OrderBase.AddOrderBaseAsync(order.ToEntity());
 
-        var itemList = new List<OrderItem>();
+        var itemList = new List<OrderItemDto>();
 
         foreach (var cartItem in cart.Items)
         {
-            itemList.Add(new OrderItem
+            itemList.Add(new OrderItemDto
             {
                 Id = Guid.NewGuid(),
                 Quantity = cartItem.Quantity,
@@ -145,7 +147,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             });
         }
 
-        await repositoryManager.OrderItem.AddOrderItemsRangeAsync(itemList);
+        await repositoryManager.OrderItem.AddOrderItemsRangeAsync(itemList.Select(i => i.ToEntity()));
         await repositoryManager.SaveAsync();
 
         repositoryManager.Cart.DeleteCart(cart);
@@ -161,15 +163,17 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
 
         var cart = await repositoryManager.Cart.GetCartAsync(cartDto.Id);
 
-        if (cart == null)
+        var dto = CartDto.FromEntity(cart);
+
+        if (dto == null)
         {
-            throw new EntityNotFoundException(nameof(Cart), cartDto.Id);
+            throw new EntityNotFoundException(nameof(CartDto), cartDto.Id);
         }
 
-        cart.TotalPrice = cartDto.TotalPrice;
-        cart.EventDate = cartDto.EventDate;
+        dto.TotalPrice = dto.TotalPrice;
+        dto.EventDate = dto.EventDate;
 
-        repositoryManager.Cart.UpdateCart(cart);
+        repositoryManager.Cart.UpdateCart(dto.ToEntity());
         await repositoryManager.SaveAsync();
 
         logger.LogInformation("Cart {cartId} updated successfully", cartDto.Id);
