@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using SemataryFabrick.Domain.Entities;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.Items;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
@@ -9,6 +8,7 @@ using SemataryFabrick.Infrastructure.Implementations.Contexts;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using Microsoft.EntityFrameworkCore;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
+using System.Text.Encodings.Web;
 
 namespace SemataryFabrick.Infrastructure.Extensions;
 
@@ -712,11 +712,11 @@ public class DataSeederExtension(ApplicationContext context)
         var inventories = items.Select(item => new ItemInventory
         {
             Id = Guid.NewGuid(),
-            Quantity = 30, 
+            Quantity = 30,
             Items = new List<Item> { item }
         }).ToList();
 
-        
+
         foreach (var (item, inventory) in items.Zip(inventories))
         {
             item.InventoryId = inventory.Id;
@@ -748,7 +748,7 @@ public class DataSeederExtension(ApplicationContext context)
             users.OfType<TechOrderLead>().Last(),
             items.Skip(3).Take(4).ToList(),
             workers,
-            discounts); 
+            discounts);
 
         await context.SaveChangesAsync();
     }
@@ -828,14 +828,18 @@ public class DataSeederExtension(ApplicationContext context)
         await context.Carts.AddRangeAsync(rentCart, eventCart);
         await context.SaveChangesAsync();
     }
-    
+
     private Item CreateItem(string name, string description, decimal price, Guid subCategoryId, Dictionary<string, string> parameters)
     {
         return new Item
         {
             Id = Guid.NewGuid(),
             Name = name,
-            Description = JsonSerializer.Serialize(parameters),
+            Description = JsonSerializer.Serialize(parameters, new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            }),
             Price = price,
             Status = ProductState.Available,
             SubCategoryId = subCategoryId,

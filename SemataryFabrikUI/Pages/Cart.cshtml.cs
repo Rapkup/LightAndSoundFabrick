@@ -1,12 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.CartDtos;
 using SemataryFabrick.Application.Entities.Exceptions;
-using SemataryFabrick.Domain.Contracts.Repositories;
-using SemataryFabrick.Domain.Entities.Models.CartModels;
-using System.ComponentModel.DataAnnotations;
 
 namespace SemataryFabrikUI.Pages
 {
