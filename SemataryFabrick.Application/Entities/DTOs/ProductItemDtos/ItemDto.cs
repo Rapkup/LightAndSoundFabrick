@@ -1,7 +1,5 @@
 ﻿using SemataryFabrick.Domain.Entities.Enums;
-using SemataryFabrick.Domain.Entities.Models.CartModels;
 using SemataryFabrick.Domain.Entities.Models.Items;
-using SemataryFabrick.Domain.Entities.Models.OrderModels;
 
 namespace SemataryFabrick.Application.Entities.DTOs.ProductItemDtos;
 public record ItemDto

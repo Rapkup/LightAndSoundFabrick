@@ -34,4 +34,18 @@ partial class CartItemRepository(ApplicationContext context) : RepositoryBase<Ca
         return await context.CartItems
             .FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.ProductId == productId);
     }
+    public async Task DeleteCartItemsByCartId(Guid cartId)
+    {
+        await context.CartItems
+            .Where(ci => ci.CartId == cartId)
+            .ExecuteDeleteAsync();
+    }
+    public async Task<IEnumerable<CartItem>?> GetCartItemsByCartId(Guid cartId)
+    {
+        var items = await context.CartItems
+            .Where(ci => ci.CartId == cartId)
+            .ToListAsync();
+
+        return items.Any() ? items : null;
+    }
 }

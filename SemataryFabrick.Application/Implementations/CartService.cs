@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.CartDtos;
+using SemataryFabrick.Application.Entities.DTOs.ProductItemDtos;
 using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Enums;
@@ -52,8 +53,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         var cartWithItems =
             await repositoryManager.Cart.GetCartWithRelatedItemsAndProductsByUserIdAsync(userId);
 
-
-        return cartWithItems.Items.Select(ci => new CartItemToDisplayDto
+        var cartItemsToDisplay = cartWithItems.Items.Select(ci => new CartItemToDisplayDto
         {
             ImagePath = Path.Combine("images/items/", ci.Product.ImageName),
             ItemName = ci.Product.Name,
@@ -64,16 +64,27 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             EndRentDate = ci.EndRentDate,
             CartItemId = ci.Id
         }).ToList();
+
+
+        logger.LogInformation("Executed successfully service method {methodName}", nameof(GetCartItemsToDisplayByUserIdAsync));
+
+        return cartItemsToDisplay;
     }
 
     public async Task<CartDto> GetCartByUserIdAsync(Guid userId)
     {
+        logger.LogInformation("Executing {MethodName} for user {UserId}",
+            nameof(GetCartByUserIdAsync), userId);
+
         var cart = await repositoryManager.Cart.GetCartByUserIdAsync(userId);
 
         if (cart is null)
         {
             throw new EntityNotFoundException(nameof(Cart), "By userId: " + userId);
         }
+
+        logger.LogDebug("Successfully retrieved cart {CartId} for user {UserId}",
+            cart.Id, userId);
 
         return CartDto.CartToCartDto(cart);
     }
@@ -100,6 +111,9 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
 
     public async Task PlaceAnOrder(CartDto cartDto)
     {
+        logger.LogInformation("Executing {MethodName} for cart {CartId}",
+            nameof(PlaceAnOrder), cartDto.Id);
+
         var cart = await repositoryManager.Cart.GetCartWithRelatedItemsByIdAsync(cartDto.Id);
 
         if (cart is null)
@@ -152,7 +166,8 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         repositoryManager.Cart.DeleteCart(cart);
         await repositoryManager.SaveAsync();
 
-
+        logger.LogInformation("Successfully placed order {OrderId} from cart {CartId}",
+           order.Id, cart.Id);
     }
 
     public async Task UpdateCartAsync(CartDto cartDto)
@@ -173,11 +188,14 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         repositoryManager.Cart.UpdateCart(cart);
         await repositoryManager.SaveAsync();
 
-        logger.LogInformation("Cart {cartId} updated successfully", cartDto.Id);
+        logger.LogInformation("Successfully updated cart {CartId}", cartDto.Id);
     }
 
-    public async Task<Cart> GetOrCreateCartAsync(Guid userId)
+    public async Task<CartDto> GetOrCreateCartAsync(Guid userId)
     {
+        logger.LogInformation("Executing {MethodName} for user {UserId}",
+         nameof(GetOrCreateCartAsync), userId);
+
         var cart = await repositoryManager.Cart.GetCartByUserIdAsync(userId);
 
         if (cart == null)
@@ -186,7 +204,6 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             {
                 Id = Guid.NewGuid(),
                 CustomerId = userId,
-                Items = new List<CartItem>(),
                 TotalPrice = 0
             };
 
@@ -194,67 +211,103 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             await repositoryManager.SaveAsync();
         }
 
-        return cart;
+        logger.LogInformation("Created new cart {CartId} for user {UserId}",
+              cart.Id, userId);
+
+        return CartDto.CartToCartDto(cart);
     }
 
-    public async Task AddOrUpdateCartItemAsync(Guid userId, Guid productId, int quantity)
+    public async Task<CartDto> GetOrCreateCartAsync(Guid userId, DateOnly eventDate)
     {
-        logger.LogInformation("Adding/Updating cart item for user {userId} and product {productId}",
-            userId, productId);
+        logger.LogInformation("Executing {MethodName} for user {UserId} with event date {EventDate}",
+            nameof(GetOrCreateCartAsync), userId, eventDate);
 
-        // 1. Получаем или создаем корзину
-        var cart = await GetOrCreateCartAsync(userId);
+        var cart = await repositoryManager.Cart.GetCartByUserIdAsync(userId);
 
-        // 2. Проверяем существование продукта
-        var product = await repositoryManager.Item.GetItemAsync(productId);
-        if (product == null)
+        if (cart == null)
         {
-            logger.LogError("Product {productId} not found", productId);
-            throw new EntityNotFoundException(nameof(Item), productId);
-        }
+            cart = new Cart
+            {
+                Id = Guid.NewGuid(),
+                EventDate = eventDate,
+                CustomerId = userId,
+                TotalPrice = 0
+            };
 
-        // 3. Ищем существующую позицию
-        var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
-
-        if (existingItem != null)
-        {
-            // 4. Обновляем существующую позицию
-            existingItem.Quantity += quantity;
-            repositoryManager.CartItem.UpdateCartItem(existingItem);
-            logger.LogDebug("Updated existing item {itemId} in cart {cartId}",
-                existingItem.Id, cart.Id);
+            await repositoryManager.Cart.AddCartAsync(cart);
+            await repositoryManager.SaveAsync();
         }
         else
         {
-            // 5. Создаем новую позицию
-            var newCartItem = new CartItem
-            {
-                Id = Guid.NewGuid(),
-                CartId = cart.Id,
-                ProductId = productId,
-                Quantity = quantity,
-                StartRentDate = null,
-                EndRentDate = null,
-            };
-
-            await repositoryManager.CartItem.AddCartItemAsync(newCartItem);
-            logger.LogDebug("Added new item {itemId} to cart {cartId}",
-                newCartItem.Id, cart.Id);
+            cart.EventDate = eventDate;
+            repositoryManager.Cart.UpdateCart(cart);
+            await repositoryManager.SaveAsync();
         }
 
-        // 6. Пересчитываем общую стоимость
-        cart.TotalPrice = await CalculateCartTotal(cart.Id);
-        repositoryManager.Cart.UpdateCart(cart);
+        logger.LogInformation("Created new cart {CartId} for user {UserId}",
+                cart.Id, userId);
 
-        // 7. Сохраняем изменения
-        await repositoryManager.SaveAsync();
-        logger.LogInformation("Cart {cartId} updated successfully", cart.Id);
+        return CartDto.CartToCartDto(cart);
     }
 
+    public async Task AddCartItemsAsync(Guid cartId, IEnumerable<CartItemDto> cartItems)
+    {
+        logger.LogInformation("Executing {MethodName} for cart {CartId} with {ItemCount} items",
+          nameof(AddCartItemsAsync), cartId, cartItems.Count());
+
+        await repositoryManager.CartItem.DeleteCartItemsByCartId(cartId);
+
+        var productIds = cartItems.Select(ci => ci.ProductId).Distinct().ToList();
+        var products = new List<ItemDto>();
+
+        foreach (var productId in productIds)
+        {
+            var product = await repositoryManager.Item.GetItemAsync(productId);
+
+            if (product == null)
+            {
+                logger.LogError("Product {productId} not found", productId);
+                throw new EntityNotFoundException(nameof(Item), productId);
+            }
+            products.Add(ItemDto.FromEntity(product));
+        }
+
+        if (products.Count() != productIds.Count)
+        {
+            var missingIds = productIds.Except(products.Select(p => p.Id));
+            throw new EntityNotFoundException(nameof(Item), $"Отсутствуют продукты: {string.Join(", ", missingIds)}");
+        }
+
+        var newItems = cartItems.Select(cartItem => new CartItemDto
+        {
+            Id = Guid.NewGuid(),
+            CartId = cartId,
+            ProductId = cartItem.ProductId,
+            Quantity = cartItem.Quantity,
+            DiscountId = cartItem.DiscountId
+        }).ToList();
+
+        foreach (var item in newItems)
+        {
+            await repositoryManager.CartItem.AddCartItemAsync(item.ToEntity());
+        }
+
+
+        var cart = await repositoryManager.Cart.GetCartWithRelatedItemsByIdAsync(cartId);
+        cart.TotalPrice = await CalculateCartTotal(cartId);
+
+        repositoryManager.Cart.UpdateCart(cart);
+        await repositoryManager.SaveAsync();
+
+        logger.LogInformation("Successfully added {ItemCount} items to cart {CartId}",
+       newItems.Count, cartId);
+    }
     private async Task<decimal> CalculateCartTotal(Guid cartId)
     {
+        logger.LogDebug("Calculating total for cart {CartId}", cartId);
+
         var cartWithItems = await repositoryManager.Cart.GetCartWithRelatedItemsByIdAsync(cartId);
-        return cartWithItems.Items.Sum(item =>
+        var total = cartWithItems.Items.Sum(item =>
         {
             var price = item.Product.Price;
             if (item.Discount != null)
@@ -263,5 +316,8 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
             }
             return price * item.Quantity;
         });
+
+        logger.LogDebug("Calculated total {Total} for cart {CartId}", total, cartId);
+        return total;
     }
 }

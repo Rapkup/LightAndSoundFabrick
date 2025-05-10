@@ -32,4 +32,11 @@ public class SubCategoryService(IRepositoryManager repositoryManager, ILogger<Su
 
         return subCategories;
     }
+
+    public async Task<IEnumerable<SubCategoryDto>> GetAllSubCategoriesAsync()
+    {
+        var subCategories =  await repositoryManager.SubCategory.GetAllSubCategoriesAsync();
+
+        return subCategories.Select(SubCategoryDto.FromEntity);
+    }
 }

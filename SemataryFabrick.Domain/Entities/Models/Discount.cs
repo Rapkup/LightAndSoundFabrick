@@ -1,7 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.CartModels;
-using SemataryFabrick.Domain.Entities.Models.Items;
-
-namespace SemataryFabrick.Domain.Entities.Models;
+﻿namespace SemataryFabrick.Domain.Entities.Models;
 
 public class Discount
 {

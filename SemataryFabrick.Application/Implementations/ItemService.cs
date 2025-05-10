@@ -21,7 +21,6 @@ public class ItemService(IRepositoryManager repositoryManager, ILogger<ItemServi
 
         foreach (var cartItemId in cartItemsId)
         {
-
             var cartItem = await repositoryManager.CartItem.GetCartItemWithProductAsync(cartItemId);
 
             if (cartItem != null && cartItem.Product != null)

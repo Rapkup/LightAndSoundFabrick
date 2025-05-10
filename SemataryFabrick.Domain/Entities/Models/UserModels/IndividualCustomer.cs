@@ -1,6 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.OrderModels;
-
-namespace SemataryFabrick.Domain.Entities.Models.UserModels;
+﻿namespace SemataryFabrick.Domain.Entities.Models.UserModels;
 public class IndividualCustomer : ApplicationUser
 {
     public string PassportIdNumber { get; set; }
