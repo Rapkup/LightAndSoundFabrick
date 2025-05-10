@@ -17,4 +17,11 @@ public class SubCategoryRepository(ApplicationContext context) : RepositoryBase<
 
     public async Task<SubCategory?> GetSubCategoryAsync(Guid id)
         => await Find(ci => ci.Id == id).FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<SubCategory>> GetSubCategoriesByParentIdsAsync(IEnumerable<Guid> parentIds)
+    {
+        return await context.SubCategories
+            .Where(sc => parentIds.Contains(sc.ParentCategoryId))
+            .ToListAsync();
+    }
 }

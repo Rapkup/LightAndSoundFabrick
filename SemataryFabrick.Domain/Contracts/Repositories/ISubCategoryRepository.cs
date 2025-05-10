@@ -8,4 +8,5 @@ public interface ISubCategoryRepository
     Task AddSubCategoryAsync(SubCategory subCategory);
     Task<SubCategory?> GetSubCategoryAsync(Guid id);
     Task<IEnumerable<SubCategory>> GetAllSubCategoriesAsync();
+    Task<IEnumerable<SubCategory>> GetSubCategoriesByParentIdsAsync(IEnumerable<Guid> parentIds);
 }

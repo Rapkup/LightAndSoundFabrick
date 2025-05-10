@@ -7,6 +7,7 @@ using SemataryFabrick.Infrastructure.Implementations.Contexts;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using Microsoft.EntityFrameworkCore;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
+using System.Text.Encodings.Web;
 
 namespace SemataryFabrick.Infrastructure.Extensions;
 
@@ -833,7 +834,11 @@ public class DataSeederExtension(ApplicationContext context)
         {
             Id = Guid.NewGuid(),
             Name = name,
-            Description = JsonSerializer.Serialize(parameters),
+            Description = JsonSerializer.Serialize(parameters, new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            }),
             Price = price,
             Status = ProductState.Available,
             SubCategoryId = subCategoryId,

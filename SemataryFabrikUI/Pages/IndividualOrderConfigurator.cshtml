@@ -1,4 +1,456 @@
 ﻿@page
-@model SemataryFabrikUI.Pages.IndividualOrderConfiguratorModel
+@model IndividualOrderConfiguratorModel
 @{
+    ViewData["Title"] = "Конфигуратор заказа";
+}
+
+
+@section Styles {
+    <style>
+        .form-check-input:checked + .form-check-label {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .card-img-top {
+            border-radius: 0.25rem 0.25rem 0 0;
+        }
+
+        .modal-body form {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .sticky-top {
+            top: 20px;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #6c757d !important;
+        }
+
+        .price-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #28a745;
+        }
+
+        .specifications dl {
+            font-size: 0.9rem;
+        }
+
+        .specifications dt {
+            font-weight: 500;
+            color: #4a5568;
+            padding: 0.25rem 0;
+        }
+
+        .specifications dd {
+            color: #718096;
+            padding: 0.25rem 0;
+            margin-left: 0;
+        }
+
+        .specifications dt::after {
+            content: ":";
+        }
+    </style>
+}
+<div class="progress mb-4">
+    <div class="progress-bar" role="progressbar"
+         style="width: @(Model.State.CurrentStep * 25)%">
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Основные шаги -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    @if (Model.State.CurrentStep == 1)
+                    {
+                        <h3 class="mb-4">Шаг 1: Выбор категорий</h3>
+                        <form method="post">
+                            <div class="row">
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check card p-3">
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="cat-@cat.Id"
+                                                   name="selectedCategoryIds"
+                                                   value="@cat.Id"
+                                                   checked="@Model.State.SelectedCategoryIds.Contains(cat.Id)">
+                                            <label class="form-check-label h5" for="cat-@cat.Id">
+                                                @cat.Name
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <button type="submit" class="btn btn-primary" asp-page-handler="SelectCategories">Далее →</button>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 2)
+                    {
+                        <h3 class="mb-4">Шаг 2: Выбор подкатегорий</h3>
+                        <form method="post">
+                            <div class="row">
+                                @foreach (var sub in Model.SubCategories)
+                                {
+                                    <div class="col-md-4 mb-3">
+                                        <div class="form-check card p-2">
+                                            <input class="form-check-input" type="checkbox"
+                                                   id="sub-@sub.Id"
+                                                   name="selectedSubCategoryIds"
+                                                   value="@sub.Id"
+                                                   checked="@Model.State.SelectedSubCategoryIds.Contains(sub.Id)">
+                                            <label class="form-check-label" for="sub-@sub.Id">
+                                                @sub.Name
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="1">
+                                    ← Назад
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        asp-page-handler="SelectSubcategories">
+                                    Далее →
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 3)
+                    {
+                        <h3 class="mb-4">Шаг 3: Выбор даты</h3>
+                        <form method="post">
+                            <div class="form-group">
+                                <label>Дата мероприятия:</label>
+                                <input type="date" class="form-control"
+                                       name="eventDate"
+                                       value="@Model.State.EventDate.ToString("yyyy-MM-dd")"
+                                       min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="2">
+                                    ← Назад
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        asp-page-handler="SetDate">
+                                    Далее →
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else if (Model.State.CurrentStep == 4)
+                    {
+                        <h3 class="mb-4">Шаг 4: Выбор товаров</h3>
+
+                        @if (Model.Items?.Any() == true)
+                        {
+                            <div class="product-categories">
+                                @{
+                                    // Группируем товары по родительским категориям
+                                    var itemsGrouped = Model.Items
+                                    .GroupBy(i => Model.SubCategoryToCategoryMap.GetValueOrDefault(i.SubCategoryId, Guid.Empty))
+                                    .Where(g => g.Key != Guid.Empty)
+                                    .OrderBy(g => Model.CategoryNames.GetValueOrDefault(g.Key, ""));
+                                }
+
+                                @foreach (var categoryGroup in itemsGrouped)
+                                {
+                                    var categoryName = Model.CategoryNames.GetValueOrDefault(categoryGroup.Key, "Без категории");
+
+                                    <div class="category-section mb-5">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="category-title m-0">
+                                                @categoryName
+                                            </h4>
+                                            <span class="badge badge-primary">
+                                                @categoryGroup.Count() товаров
+                                            </span>
+                                        </div>
+
+                                        <div class="row">
+                                            @foreach (var item in categoryGroup.OrderBy(i => i.Name))
+                                            {
+                                                var subCategory = Model.SubCategories.FirstOrDefault(s => s.Id == item.SubCategoryId);
+
+                                                <div class="col-lg-4 col-md-6 mb-4">
+                                                    <div class="card h-100">
+                                                        <img src="/images/items/@item.ImageName"
+                                                             class="card-img-top"
+                                                             alt="@item.Name"
+                                                             style="height: 200px; object-fit: cover;">
+
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">@item.Name</h5>
+                                                            @if (subCategory != null)
+                                                            {
+                                                                <p class="text-muted small mb-2">
+                                                                    <i class="fas fa-tag mr-1"></i> @subCategory.Name
+                                                                </p>
+                                                            }
+                                                            <p class="card-text price-text">
+                                                                <span>Br</span> @item.Price.ToString("N2")
+                                                            </p>
+
+                                                            <button type="button"
+                                                                    class="btn btn-outline-info btn-sm"
+                                                                    data-toggle="modal"
+                                                                    data-target="#itemModal-@item.Id">
+                                                                <i class="fas fa-info-circle mr-1"></i> Подробнее
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="card-footer bg-white">
+                                                            <form method="post" class="d-flex">
+                                                                <input type="number"
+                                                                       class="form-control"
+                                                                       value="@Model.State.CartItems.GetValueOrDefault(item.Id, 1)"
+                                                                       min="1"
+                                                                       name="quantity"
+                                                                       style="width: 70px;">
+
+                                                                <button type="submit"
+                                                                        class="btn btn-primary ml-2 flex-grow-1"
+                                                                        asp-page-handler="AddItem"
+                                                                        asp-route-itemId="@item.Id">
+                                                                    <i class="fas fa-cart-plus mr-1"></i> В корзину
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Модальное окно с деталями товара -->
+                                                <!-- Модальное окно с деталями товара -->
+                                                <div class="modal fade" id="itemModal-@item.Id" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel-@item.Id" aria-hidden="true">
+                                                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-light">
+                                                                <h5 class="modal-title font-weight-bold" id="itemModalLabel-@item.Id">@item.Name</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+
+                                                            <div class="modal-body">
+                                                                @{
+                                                                    var parameters = Model.ParseItemParameters(item);
+                                                                    var modalCategoryName = Model.CategoryNames.GetValueOrDefault(
+                                                                    Model.SubCategoryToCategoryMap.GetValueOrDefault(item.SubCategoryId, Guid.Empty),
+                                                                    "Без категории");
+                                                                    var modalSubCategory = Model.SubCategories.FirstOrDefault(s => s.Id == item.SubCategoryId);
+                                                                }
+
+                                                                <div class="row">
+                                                                    <!-- Колонка с изображением -->
+                                                                    <div class="col-md-5">
+                                                                        <div class="sticky-top" style="top: 20px;">
+                                                                            <img src="/images/items/@item.ImageName"
+                                                                                 class="img-fluid rounded mb-3 shadow-sm"
+                                                                                 alt="@item.Name"
+                                                                                 style="max-height: 400px; width: 100%; object-fit: contain;">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <!-- Колонка с информацией -->
+                                                                    <div class="col-md-7">
+                                                                        <div class="mb-4">
+                                                                            <h6 class="text-muted mb-2">Категория</h6>
+                                                                            <p class="mb-1">@modalCategoryName</p>
+                                                                            @if (modalSubCategory != null)
+                                                                            {
+                                                                                <p class="text-muted small">@modalSubCategory.Name</p>
+                                                                            }
+                                                                            <p class="price-text h5 mt-3">
+                                                                                <span>Br</span> @item.Price.ToString("N2")
+                                                                            </p>
+                                                                        </div>
+
+                                                                        @if (parameters.Any())
+                                                                        {
+                                                                            <div class="mb-4">
+                                                                                <h6 class="text-muted mb-3">Характеристики</h6>
+                                                                                <div class="specifications">
+                                                                                    @foreach (var (key, value) in parameters)
+                                                                                    {
+                                                                                        <div class="d-flex mb-2 pb-2 border-bottom">
+                                                                                            <div class="font-weight-bold text-dark" style="width: 45%;">@key</div>
+                                                                                            <div style="width: 55%;">@value</div>
+                                                                                        </div>
+                                                                                    }
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="alert alert-info">
+                                                                                Нет дополнительных характеристик
+                                                                            </div>
+                                                                        }
+
+                                                                        <!-- Исправленная форма добавления в корзину -->
+                                                                        <form method="post" class="mt-4">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="number"
+                                                                                       class="form-control mr-3"
+                                                                                       style="width: 100px;"
+                                                                                       value="@Model.State.CartItems.GetValueOrDefault(item.Id, 1)"
+                                                                                       min="1"
+                                                                                       name="quantity">
+                                                                                <button type="submit"
+                                                                                        class="btn btn-primary flex-grow-1"
+                                                                                        asp-page-handler="AddItem"
+                                                                                        asp-route-itemId="@item.Id">
+                                                                                    <i class="fas fa-cart-plus mr-1"></i> Добавить в корзину
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                Нет доступных товаров для выбранных категорий
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <form method="post">
+                                <button type="submit"
+                                        class="btn btn-secondary"
+                                        asp-page-handler="BackToStep"
+                                        asp-route-targetStep="3">
+                                    <i class="fas fa-arrow-left mr-1"></i> Назад
+                                </button>
+                            </form>
+
+                            @if (Model.State.CartItems.Any())
+                            {
+                                <form method="post">
+                                    <button type="submit"
+                                            class="btn btn-success"
+                                            asp-page-handler="Complete">
+                                        <i class="fas fa-check mr-1"></i> Завершить конфигурацию
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно авторизации -->
+        <div class="modal fade" id="authModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Требуется авторизация</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Для завершения заказа необходимо авторизоваться. Все товары в корзине будут сохранены.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary"
+                           href="/Authorization/Login?returnUrl=@Url.Page("/IndividualOrderConfigurator")">
+                            Войти
+                        </a>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Продолжить покупки</button>
+                        <form method="post">
+                            <button type="submit" class="btn btn-danger" asp-page-handler="ResetCart">
+                                Сбросить корзину
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель корзины -->
+        <div class="col-md-4">
+            <div class="card sticky-top">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Ваша корзина</h5>
+                    <span class="badge badge-primary">@Model.State.CartItems.Sum(x => x.Value)</span>
+                </div>
+                <div class="card-body">
+                    @if (Model.State.CartItems.Any())
+                    {
+                        <ul class="list-group mb-3">
+                            @foreach (var (itemId, qty) in Model.State.CartItems)
+                            {
+                                var item = Model.Items?.FirstOrDefault(i => i.Id == itemId);
+                                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                    <div>
+                                        <h6 class="my-0">@item?.Name</h6>
+                                        <small class="text-muted">@item?.Price.ToString("C") x @qty</small>
+                                    </div>
+                                    <span class="text-muted">@((item?.Price * qty)?.ToString("C"))</span>
+                                    <form method="post">
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                asp-page-handler="RemoveItem"
+                                                asp-route-itemId="@itemId">
+                                            ×
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                        <div class="d-flex justify-content-between">
+                            <span>Итого:</span>
+                            <strong>@Model.CartTotal.ToString("C")</strong>
+                        </div>
+                        <form method="post">
+                            <button type="submit"
+                                    class="btn btn-success btn-block mt-3"
+                                    asp-page-handler="Complete">
+                                Оформить заказ
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Корзина пуста</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+                $(document).ready(function() {
+        @if (TempData["ShowAuthModal"] as bool? == true)
+        {
+            <text>$('#authModal').modal('show');</text>
+        }
+        });
+    </script>
 }

@@ -5,6 +5,7 @@ using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Models;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
+using SemataryFabrick.Domain.Entities.Models.Items;
 
 namespace SemataryFabrick.Application.Implementations;
 public class CartItemService(IRepositoryManager repositoryManager, ILogger<CartItemService> logger) : ICartItemService
@@ -61,12 +62,53 @@ public class CartItemService(IRepositoryManager repositoryManager, ILogger<CartI
     }
 
     public async Task UpdateQuantity(Guid cartItemId, int quantity)
-{
-    var item = await repositoryManager.CartItem.GetCartItemAsync(cartItemId);
-    item.Quantity = quantity;
-    repositoryManager.CartItem.UpdateCartItem(item);
-    await repositoryManager.SaveAsync();
-}
+    {
+        var item = await repositoryManager.CartItem.GetCartItemAsync(cartItemId);
+        item.Quantity = quantity;
+        repositoryManager.CartItem.UpdateCartItem(item);
+        await repositoryManager.SaveAsync();
+    }
+
+    public async Task AddOrUpdateCartItemAsync(Guid cartId, Guid productId, int quantity)
+    {
+        logger.LogInformation("Adding/Updating cart item for cart {cartId} and product {productId}",
+            cartId, productId);
+
+        // Проверка существования продукта
+        var product = await repositoryManager.Item.GetItemAsync(productId);
+        if (product == null)
+        {
+            throw new EntityNotFoundException(nameof(Item), productId);
+        }
+
+        // Поиск существующей позиции
+        var existingItem = await repositoryManager.CartItem
+            .GetCartItemByCartAndProductAsync(cartId, productId);
+
+        if (existingItem != null)
+        {
+            // Обновление существующей позиции
+            existingItem.Quantity += quantity;
+            repositoryManager.CartItem.UpdateCartItem(existingItem);
+        }
+        else
+        {
+            // Создание новой позиции
+            var newCartItem = new CartItem
+            {
+                Id = Guid.NewGuid(),
+                CartId = cartId,
+                ProductId = productId,
+                Quantity = quantity,
+                StartRentDate = null,
+                EndRentDate = null
+            };
+
+            await repositoryManager.CartItem.AddCartItemAsync(newCartItem);
+        }
+
+        await repositoryManager.SaveAsync();
+    }
 
     public async Task DeleteCartItemAsync(Guid cartItemId)
     {

@@ -7,7 +7,10 @@ public interface ICartItemRepository
     void UpdateCartItem(CartItem cartItem);
     Task AddCartItemAsync(CartItem cartItem);
     Task<CartItem?> GetCartItemAsync(Guid id);
+    Task<IEnumerable<CartItem>?> GetCartItemsByCartId(Guid cartId);
+    Task DeleteCartItemsByCartId(Guid cartId);
     Task<int> GetCartItemsCountByCartIdAsync(Guid cartId);
     Task<IEnumerable<CartItem>> GetAllCartItemsAsync();
     Task<CartItem?> GetCartItemWithProductAsync(Guid cartItemId);
+    Task<CartItem?> GetCartItemByCartAndProductAsync(Guid cartId, Guid productId);
 }

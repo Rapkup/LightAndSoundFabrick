@@ -1,6 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models.OrderModels;
-
-namespace SemataryFabrick.Domain.Entities.Models.UserModels;
+﻿namespace SemataryFabrick.Domain.Entities.Models.UserModels;
 public class LegalCustomer : ApplicationUser
 {
     public string CompanyName { get; set; }
