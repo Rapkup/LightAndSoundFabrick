@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
@@ -11,6 +12,8 @@ namespace SemataryFabrikUI.Pages;
 public class AccountModel : PageModel
 {
     private readonly ApplicationContext _context;
+    private readonly IUserService _userService;
+    private readonly IOrderBaseService _orderBaseService;
 
     public ApplicationUser CurrentUser { get; set; }
     public List<OrderBase> Orders { get; set; }
@@ -19,9 +22,11 @@ public class AccountModel : PageModel
     public List<OrderBase> ActiveOrders { get; set; }
     public List<OrderBase> PendingConfirmationOrders { get; set; }
 
-    public AccountModel(ApplicationContext context)
+    public AccountModel(ApplicationContext context, IUserService userService, IOrderBaseService orderBaseService)
     {
         _context = context;
+        _userService = userService;
+        _orderBaseService = orderBaseService;
     }
 
     public async Task<IActionResult> OnGetAsync()
@@ -34,12 +39,17 @@ public class AccountModel : PageModel
         var userId = Guid.Parse(HttpContext.Session.GetString("UserId"));
         var userType = HttpContext.Session.GetString("UserType");
 
-        // Load user data
+        //CurrentUser = await _userService.GetUserAsync(userId);
+
         CurrentUser = await _context.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        // Load all user orders
+
+        var orders = await _orderBaseService.GetUserOrdersByStateOrPayStatusAsync(userId, null, null);
+
+       // Orders = orders.Select(o => OrderBaseDto.FromEntity(o)).ToList();
+
         Orders = await _context.Orders
             .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Product)
@@ -47,7 +57,6 @@ public class AccountModel : PageModel
             .AsNoTracking()
             .ToListAsync();
 
-        // Filter orders by status
         DoneOrders = Orders.Where(o => o.OrderState == OrderState.Done).ToList();
         UnpaidOrders = Orders.Where(o => o.PaymentState == PaymentStatus.Unpaid).ToList();
         ActiveOrders = Orders.Where(o => o.OrderState == OrderState.ApprovedByManager ||
@@ -57,11 +66,11 @@ public class AccountModel : PageModel
         return Page();
     }
 
-    public IActionResult OnGetOrderDetails(Guid orderId)
+    public IActionResult OnGetOrderDetails([FromQuery] Guid orderId)
     {
         var order = _context.Orders
             .Include(o => o.OrderItems)
-            .ThenInclude(oi => oi.Product)
+            .ThenInclude(oi => oi.Product) 
             .FirstOrDefault(o => o.Id == orderId);
 
         if (order == null) return NotFound();

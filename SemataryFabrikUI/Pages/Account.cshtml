@@ -89,12 +89,16 @@
 @section Scripts {
     <script>
         function showOrderDetails(orderId) {
-            fetch(`/Account/OrderDetails?orderId=${orderId}`)
-                .then(response => response.text())
+            fetch(`/Account?handler=OrderDetails&orderId=${orderId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.text();
+                })
                 .then(html => {
                     document.getElementById('orderDetailsContent').innerHTML = html;
                     $('#orderDetailsModal').modal('show');
-                });
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
 }

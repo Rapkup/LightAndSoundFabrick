@@ -86,7 +86,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         logger.LogDebug("Successfully retrieved cart {CartId} for user {UserId}",
             cart.Id, userId);
 
-        return CartDto.CartToCartDto(cart);
+        return CartDto.FromEntity(cart);
     }
 
     public async Task DeleteCartAsync(Guid userId)
@@ -214,7 +214,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         logger.LogInformation("Created new cart {CartId} for user {UserId}",
               cart.Id, userId);
 
-        return CartDto.CartToCartDto(cart);
+        return CartDto.FromEntity(cart);
     }
 
     public async Task<CartDto> GetOrCreateCartAsync(Guid userId, DateOnly eventDate)
@@ -247,7 +247,7 @@ public class CartService(IRepositoryManager repositoryManager, ILogger<CartServi
         logger.LogInformation("Created new cart {CartId} for user {UserId}",
                 cart.Id, userId);
 
-        return CartDto.CartToCartDto(cart);
+        return CartDto.FromEntity(cart);
     }
 
     public async Task AddCartItemsAsync(Guid cartId, IEnumerable<CartItemDto> cartItems)

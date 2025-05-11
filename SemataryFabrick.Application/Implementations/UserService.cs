@@ -51,4 +51,9 @@ public class UserService(IRepositoryManager repositoryManager, ILogger<UserServi
 
         return UserDto.ToUserDto(userToRegister);
     }
+
+    public async Task<UserDto> GetUserAsync(Guid id)
+    {
+        return UserDto.ToUserDto(await repositoryManager.User.GetUserAsync(id));
+    }
 }

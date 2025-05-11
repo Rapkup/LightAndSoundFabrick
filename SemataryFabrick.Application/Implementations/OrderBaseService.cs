@@ -7,7 +7,7 @@ using SemataryFabrick.Domain.Entities.Models.OrderModels;
 namespace SemataryFabrick.Application.Implementations;
 public class OrderBaseService(IRepositoryManager repositoryManager, ILogger<CartService> logger) : IOrderBaseService
 {
-    public async Task<IEnumerable<OrderBase>> GetUserOrdersByStateAsync(Guid userId, OrderState? state, PaymentStatus? paymentStatus)
+    public async Task<IEnumerable<OrderBase>?> GetUserOrdersByStateOrPayStatusAsync(Guid userId, OrderState? state, PaymentStatus? paymentStatus)
     {
         var orderList = await repositoryManager.OrderBase.GetOrdersBaseWithRelatedItemsByUserId(userId);
 
