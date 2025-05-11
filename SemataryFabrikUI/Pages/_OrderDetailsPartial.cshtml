@@ -1,0 +1,22 @@
+﻿@using SemataryFabrick.Domain.Entities.Models.OrderModels
+@model OrderBase
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Информация о заказе</h5>
+        <p>Адрес мероприятия: @Model.EventAddress</p>
+        <p>Дата: @Model.EventDate?.ToString("d")</p>
+        <p>Статус оплаты: @Model.PaymentState</p>
+    </div>
+    <div class="col-md-6">
+        <h5>Позиции заказа</h5>
+        <ul class="list-group">
+            @foreach (var item in Model.OrderItems)
+            {
+                <li class="list-group-item">
+                    @item.Product.Name - @item.Quantity x @item.Product.Price.ToString("C")
+                </li>
+            }
+        </ul>
+    </div>
+</div>

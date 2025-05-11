@@ -59,12 +59,6 @@ namespace SemataryFabrikUI.Pages
             }
         }
 
-        private decimal CalculateTotalPrice()
-        {
-            return CartItems.Sum(item =>
-                item.Price * item.Quantity * (1 - item.Discount / 100m));
-        }
-
         public async Task<IActionResult> OnPostUpdateRentalDatesAsync(
             Guid cartItemId,
             DateOnly startRentDate,
@@ -204,6 +198,12 @@ namespace SemataryFabrikUI.Pages
             return string.IsNullOrEmpty(dateString) ?
                 null :
                 DateOnly.Parse(dateString);
+        }
+
+        private decimal CalculateTotalPrice()
+        {
+            return CartItems.Sum(item =>
+                item.Price * item.Quantity * (1 - item.Discount / 100m));
         }
 
     }

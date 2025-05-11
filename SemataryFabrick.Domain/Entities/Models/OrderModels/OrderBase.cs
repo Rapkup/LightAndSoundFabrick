@@ -6,10 +6,12 @@ public class OrderBase
 {
     public Guid Id { get; set; }
     public decimal TotalPrice { get; set; }
+
     public string? EventAddress { get; set; }
     public DateOnly? EventDate { get; set; }
     public DateOnly? StartRentDate { get; set; }
     public DateOnly? EndRentDate { get; set; }
+    public OrderState OrderState { get; set; }
     public OrderType OrderType { get; set; }
     public PaymentStatus PaymentState { get; set; }
     public Guid CustomerId { get; set; }

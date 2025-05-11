@@ -28,6 +28,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasPostgresEnum<OrderType>();
+        modelBuilder.HasPostgresEnum<OrderState>();
         modelBuilder.HasPostgresEnum<PaymentStatus>();
         modelBuilder.HasPostgresEnum<ProductState>();
         modelBuilder.HasPostgresEnum<UserType>();

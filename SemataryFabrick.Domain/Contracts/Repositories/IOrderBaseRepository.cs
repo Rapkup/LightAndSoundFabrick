@@ -8,4 +8,5 @@ public interface IOrderBaseRepository
     Task AddOrderBaseAsync(OrderBase orderBase);
     Task<OrderBase?> GetOrderBaseAsync(Guid id);
     Task<IEnumerable<OrderBase>> GetAllOrderBasesAsync();
+    Task<IEnumerable<OrderBase>?> GetOrdersBaseWithRelatedItemsByUserId(Guid userId);
 }

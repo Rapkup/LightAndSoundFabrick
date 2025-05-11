@@ -3,7 +3,6 @@ using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.Items;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 using SemataryFabrick.Domain.Entities.Models;
-
 using SemataryFabrick.Infrastructure.Implementations.Contexts;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using Microsoft.EntityFrameworkCore;
@@ -858,6 +857,7 @@ public class DataSeederExtension(ApplicationContext context)
             EventAddress = "ул. Центральная, 1",
             TotalPrice = items.Sum(i => i.Price),
             OrderType = OrderType.Rent,
+            OrderState = OrderState.Done,
             PaymentState = PaymentStatus.Paid,
             CustomerId = customer.Id,
             OrderManagerId = manager.Id,

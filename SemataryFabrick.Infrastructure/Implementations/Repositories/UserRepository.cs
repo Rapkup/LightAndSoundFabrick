@@ -41,4 +41,9 @@ public class UserRepository(ApplicationContext context) : IUserRepository
             .OrderBy(_ => Guid.NewGuid())
             .FirstOrDefaultAsync();
     }
+
+    public async Task<ApplicationUser> GetUserAsync(Guid id)
+    {
+        return await context.Users.FirstAsync(u => u.Id == id); 
+    }
 }
