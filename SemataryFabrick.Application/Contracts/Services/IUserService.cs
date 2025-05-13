@@ -8,6 +8,6 @@ public interface IUserService
     Task<UserDto> Register(UserDto userForRegistry);
 
     Task<UserDto> GetUserAsync(Guid id);
-    Task<IEnumerable<UserDto>?> GetTechLeads();
+    Task<IEnumerable<UserDto>> GetTechLeads();
     SelectList GetTechLeadsSelectList(IEnumerable<UserDto> techLeads);
 }

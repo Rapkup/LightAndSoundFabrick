@@ -59,23 +59,28 @@ public class UserService(IRepositoryManager repositoryManager, ILogger<UserServi
         return UserDto.ToUserDto(await repositoryManager.User.GetUserAsync(id));
     }
 
-    public async Task<IEnumerable<UserDto>?> GetTechLeads()
+     public async Task<IEnumerable<UserDto>> GetTechLeads()
     {
-        var techLeads = await repositoryManager.User.GetUsersByUserTypeAsync(UserType.TechOrderLead);
-        return techLeads.Select(UserDto.ToUserDto).ToList();
+        var users = await repositoryManager.User.GetUsersByUserTypeAsync(UserType.TechOrderLead);
+        return users.Select(u => new UserDto {
+            Id = u.Id,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            UserName = u.UserName
+        });
     }
 
     public SelectList GetTechLeadsSelectList(IEnumerable<UserDto> techLeads)
-    {
-        techLeads ??= new List<UserDto>(); // Защита от null
-        return new SelectList(
-            techLeads.Select(u => new
-            {
-                u.Id,
-                FullName = $"{u.FirstName} {u.LastName}"
-            }),
-            "Id",
-            "FullName"
-        );
-    }
+{
+    techLeads ??= new List<UserDto>(); // Защита от null
+    return new SelectList(
+        techLeads.Select(u => new
+        {
+            u.Id,
+            FullName = $"{u.FirstName} {u.LastName}"
+        }),
+        "Id",
+        "FullName"
+    );
+}
 }
