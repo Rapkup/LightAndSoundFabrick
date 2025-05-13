@@ -3,7 +3,7 @@ using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs;
 using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
-using SemataryFabrick.Domain.Entities.Models;
+using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 
 namespace SemataryFabrick.Application.Implementations;
 public class SubCategoryService(IRepositoryManager repositoryManager, ILogger<SubCategoryService> logger) : ISubCategoryService
@@ -35,8 +35,19 @@ public class SubCategoryService(IRepositoryManager repositoryManager, ILogger<Su
 
     public async Task<IEnumerable<SubCategoryDto>> GetAllSubCategoriesAsync()
     {
-        var subCategories =  await repositoryManager.SubCategory.GetAllSubCategoriesAsync();
+        var subCategories = await repositoryManager.SubCategory.GetAllSubCategoriesAsync();
 
+        return subCategories.Select(SubCategoryDto.FromEntity);
+    }
+
+    public async Task<IEnumerable<SubCategoryDto>?> GetSubCategoriesByParentIdAsync(Guid parentId)
+    {
+        var subCategories = await repositoryManager.SubCategory.GetSubCategoriesByParentId(parentId);
+
+        if (subCategories == null)
+        {
+            throw new  EntityNotFoundException(nameof(SubCategoryDto), parentId);
+        }
         return subCategories.Select(SubCategoryDto.FromEntity);
     }
 }

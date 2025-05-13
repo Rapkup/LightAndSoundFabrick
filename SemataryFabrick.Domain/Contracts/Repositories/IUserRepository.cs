@@ -8,4 +8,5 @@ public interface IUserRepository
     Task<bool> IsUserExist(string username);
     Task<ApplicationUser?> GetRandomByTypeAsync(UserType userType);
     Task<ApplicationUser> GetUserAsync(Guid id);
+    Task<IEnumerable<ApplicationUser>?> GetUsersByUserTypeAsync(UserType userType);
 }

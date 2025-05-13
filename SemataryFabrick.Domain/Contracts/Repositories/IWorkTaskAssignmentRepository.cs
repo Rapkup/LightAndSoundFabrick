@@ -8,4 +8,5 @@ public interface IWorkTaskAssignmentRepository
     Task AddWorkTaskAssignmentAsync(WorkTaskAssignment workTaskAssignment);
     Task<WorkTaskAssignment?> GetWorkTaskAssignmentAsync(Guid id);
     Task<IEnumerable<WorkTaskAssignment>> GetAllWorkTaskAssignmentsAsync();
+    Task<IEnumerable<WorkTaskAssignment>> GetTasksByOrderAsync(Guid orderId);
 }

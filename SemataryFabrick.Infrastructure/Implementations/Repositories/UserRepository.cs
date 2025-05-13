@@ -44,6 +44,12 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public async Task<ApplicationUser> GetUserAsync(Guid id)
     {
-        return await context.Users.FirstAsync(u => u.Id == id); 
+        return await context.Users.FirstAsync(u => u.Id == id);
     }
+
+    public async Task<IEnumerable<ApplicationUser>?> GetUsersByUserTypeAsync(UserType userType) 
+        => await context.Users
+            .Where(u => u.UserType.Equals(userType))
+            .ToListAsync();
+
 }

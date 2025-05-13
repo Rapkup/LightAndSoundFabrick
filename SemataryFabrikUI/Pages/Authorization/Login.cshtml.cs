@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.UserDtos;
 using SemataryFabrick.Application.Entities.Exceptions;
+using SemataryFabrick.Domain.Entities.Enums;
 
 namespace SemataryFabrikUI.Pages.Authorization
 {
@@ -42,7 +43,23 @@ namespace SemataryFabrikUI.Pages.Authorization
                     HttpContext.Session.SetString("Username", user.UserName);
                     await UpdateCartBadge();
 
-                    return RedirectToPage("/Index");
+                    switch (user.UserType)
+                    {
+                        case UserType.OrderManager:
+                            return RedirectToPage("/Dashboard/OrderManager");
+
+                        case UserType.TechOrderLead:
+                            return RedirectToPage("/Dashboard/TechOrderLead");
+
+                        case UserType.Worker:
+                            return RedirectToPage("/Dashboard/Worker");
+
+                        case UserType.Director:
+                            return RedirectToPage("/Dashboard/Director");
+
+                        default:
+                            return RedirectToPage("/Index");
+                    }
                 }
 
                 ModelState.AddModelError("", "Неверный логин или пароль");

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SemataryFabrick.Domain.Contracts.Repositories;
-using SemataryFabrick.Domain.Entities.Models;
+using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 using SemataryFabrick.Infrastructure.Implementations.Contexts;
 
 namespace SemataryFabrick.Infrastructure.Implementations.Repositories;
@@ -23,5 +23,10 @@ public class SubCategoryRepository(ApplicationContext context) : RepositoryBase<
         return await context.SubCategories
             .Where(sc => parentIds.Contains(sc.ParentCategoryId))
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<SubCategory>?> GetSubCategoriesByParentId(Guid productCategoryId)
+    {
+        return await Find(sc => sc.ParentCategoryId == productCategoryId).ToListAsync();
     }
 }

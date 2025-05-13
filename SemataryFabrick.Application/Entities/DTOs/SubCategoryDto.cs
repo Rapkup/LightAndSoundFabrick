@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models;
+﻿using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 
 namespace SemataryFabrick.Application.Entities.DTOs;
 public record SubCategoryDto

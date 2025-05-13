@@ -4,6 +4,9 @@ using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.UserDtos;
 using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
+using SemataryFabrick.Domain.Entities.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace SemataryFabrick.Application.Implementations;
 public class UserService(IRepositoryManager repositoryManager, ILogger<UserService> logger) : IUserService
@@ -51,9 +54,28 @@ public class UserService(IRepositoryManager repositoryManager, ILogger<UserServi
 
         return UserDto.ToUserDto(userToRegister);
     }
-
     public async Task<UserDto> GetUserAsync(Guid id)
     {
         return UserDto.ToUserDto(await repositoryManager.User.GetUserAsync(id));
+    }
+
+    public async Task<IEnumerable<UserDto>?> GetTechLeads()
+    {
+        var techLeads = await repositoryManager.User.GetUsersByUserTypeAsync(UserType.TechOrderLead);
+        return techLeads.Select(UserDto.ToUserDto).ToList();
+    }
+
+    public SelectList GetTechLeadsSelectList(IEnumerable<UserDto> techLeads)
+    {
+        techLeads ??= new List<UserDto>(); // Защита от null
+        return new SelectList(
+            techLeads.Select(u => new
+            {
+                u.Id,
+                FullName = $"{u.FirstName} {u.LastName}"
+            }),
+            "Id",
+            "FullName"
+        );
     }
 }

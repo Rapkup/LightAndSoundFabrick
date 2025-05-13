@@ -5,6 +5,7 @@ using SemataryFabrick.Domain.Entities.Models.OrderModels;
 using SemataryFabrick.Domain.Entities.Models.UserModels;
 using SemataryFabrick.Domain.Entities.Models;
 using SemataryFabrick.Domain.Entities.Models.Items;
+using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 
 namespace SemataryFabrick.Infrastructure.Implementations.Contexts;
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)

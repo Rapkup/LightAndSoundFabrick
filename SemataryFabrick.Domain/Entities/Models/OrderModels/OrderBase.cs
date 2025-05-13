@@ -21,6 +21,6 @@ public class OrderBase
     public ApplicationUser Customer { get; set; }
     public OrderManager OrderManager { get; set; }
     public TechOrderLead TechOrderLead { get; set; }
-    public IEnumerable<OrderItem> OrderItems { get; set; }
-    public IEnumerable<OrderCrew> OrderCrews { get; set; }
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    public ICollection<OrderCrew> OrderCrews { get; set; }
 }

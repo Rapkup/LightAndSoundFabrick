@@ -1,4 +1,4 @@
-﻿using SemataryFabrick.Domain.Entities.Models;
+﻿using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 
 namespace SemataryFabrick.Domain.Contracts.Repositories;
 public interface ISubCategoryRepository
@@ -9,4 +9,5 @@ public interface ISubCategoryRepository
     Task<SubCategory?> GetSubCategoryAsync(Guid id);
     Task<IEnumerable<SubCategory>> GetAllSubCategoriesAsync();
     Task<IEnumerable<SubCategory>> GetSubCategoriesByParentIdsAsync(IEnumerable<Guid> parentIds);
+     Task<IEnumerable<SubCategory>?> GetSubCategoriesByParentId(Guid productCategoryId);
 }

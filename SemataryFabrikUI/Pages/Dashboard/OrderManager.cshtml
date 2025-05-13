@@ -1,0 +1,195 @@
+﻿@page
+@using SemataryFabrick.Application.Contracts.Services
+@using SemataryFabrick.Application.Entities.DTOs.OrderDtos
+@using SemataryFabrick.Domain.Entities.Enums
+@model SemataryFabrikUI.Pages.Dashboard.OrderMangerModel
+@inject IUserService UserService
+@inject IWorkTaskService WorkTaskService
+@{
+    ViewData["Title"] = "Order Manager";
+    Layout = "~/Pages/Dashboard/_DashboardLayout.cshtml";
+}
+
+
+<div class="pc-content">
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="mb-0">Order Management</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs mb-3" id="ordersTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="new-tab" data-bs-toggle="tab" href="#new" role="tab">
+                        Новый заказ (@Model.NewOrders.Count)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="progress-tab" data-bs-toggle="tab" href="#progress" role="tab">
+                        Активные заказы  (@Model.InProgressOrders.Count)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="payment-tab" data-bs-toggle="tab" href="#payment" role="tab">
+                        Ожидают подтверждения оплаты (@Model.PendingPaymentOrders.Count)
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="rent-tab" data-bs-toggle="tab" href="#rent" role="tab">
+                        Заказы аренды (@Model.RentOrders.Count)
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="ordersTabContent">
+                <!-- New Orders Tab -->
+                <div class="tab-pane fade show active" id="new" role="tabpanel">
+                    @foreach (var order in Model.NewOrders)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Order #@order.Id.ToString().Substring(0, 8)
+                                <span class="badge bg-primary float-end">@order.OrderState</span>
+                            </div>
+                            <div class="card-body">
+                                <form method="post">
+                                    <input type="hidden" asp-for="UpdateModel.OrderId" value="@order.Id" />
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Тех специалист</label>
+                                            <select asp-for="UpdateModel.TechLeadId" class="form-control"
+                                                    asp-items="@(new SelectList(await UserService.GetTechLeads(), "Id", "UserName"))">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Итоговая цена</label>
+                                            <input asp-for="UpdateModel.TotalPrice" class="form-control" value="@order.TotalPrice" />
+                                        </div>
+                                        <div class="col-md-4 mt-4">
+                                            <button type="submit" class="btn btn-primary">Обновить данные</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <h6 class="mt-3">Позиции:</h6>
+                                <ul>
+                                    @if (order.OrderItems != null && order.OrderItems.Any())
+                                    {
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <li>@item.Product?.Name x @item.Quantity</li>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <li>No items in this order</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- In Progress Tab -->
+                <div class="tab-pane fade" id="progress" role="tabpanel">
+                    @foreach (var order in Model.InProgressOrders)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Order #@order.Id.ToString().Substring(0, 8)
+                                <span class="badge bg-warning float-end">@order.OrderState</span>
+                            </div>
+                            <div class="card-body">
+                                @{
+                                    var progress = await WorkTaskService.GetOrderProgressAsync(order.Id);
+                                }
+                                @if (progress.TotalTasks > 0)
+                                {
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: @(progress.CompletedPercentage)%">
+                                            @progress.CompletedTasks/@progress.TotalTasks
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info">Work not started yet</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pending Payment Tab -->
+                <div class="tab-pane fade" id="payment" role="tabpanel">
+                    @foreach (var order in Model.PendingPaymentOrders)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Order #@order.Id.ToString().Substring(0, 8)
+                                <span class="badge bg-danger float-end">@order.PaymentState</span>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" asp-page-handler="ConfirmPayment">
+                                    <input type="hidden" asp-for="ConfirmOrderId" value="@order.Id" />
+                                    <button type="submit" class="btn btn-success">Confirm Payment</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Rent Orders Tab -->
+                <div class="tab-pane fade" id="rent" role="tabpanel">
+                    @foreach (var order in Model.RentOrders)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                Order #@order.Id.ToString().Substring(0, 8)
+                                <span class="badge @GetRentStatusBadge(order) float-end">
+                                    @GetRentStatus(order)
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <p>Rent Period: @order.StartRentDate?.ToString("d") - @order.EndRentDate?.ToString("d")</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@functions {
+    private string GetRentStatus(OrderBaseDto order)
+    {
+        if (order.PaymentState == PaymentStatus.PaymentConfirmation)
+            return "Pending Confirmation";
+        if (DateTime.Now > order.EndRentDate?.ToDateTime(TimeOnly.MinValue))
+            return "Overdue";
+        return order.PaymentState.ToString();
+    }
+
+    private string GetRentStatusBadge(OrderBaseDto order)
+    {
+        return GetRentStatus(order) switch
+        {
+            "Overdue" => "bg-danger",
+            "Pending Confirmation" => "bg-warning",
+            "Paid" => "bg-success",
+            _ => "bg-secondary"
+        };
+    }
+}
+

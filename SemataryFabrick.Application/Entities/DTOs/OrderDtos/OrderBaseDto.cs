@@ -1,4 +1,5 @@
-﻿using SemataryFabrick.Domain.Entities.Enums;
+﻿using SemataryFabrick.Application.Entities.DTOs.ProductItemDtos;
+using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
 
 namespace SemataryFabrick.Application.Entities.DTOs.OrderDtos;
@@ -16,6 +17,7 @@ public record OrderBaseDto
     public Guid CustomerId { get; set; }
     public Guid OrderManagerId { get; set; }
     public Guid TechOrderLeadId { get; set; }
+    public List<OrderItemDto> OrderItems { get; set; } = new();
 
     public static OrderBaseDto FromEntity(OrderBase entity)
     {
@@ -32,7 +34,14 @@ public record OrderBaseDto
             PaymentState = entity.PaymentState,
             CustomerId = entity.CustomerId,
             OrderManagerId = entity.OrderManagerId,
-            TechOrderLeadId = entity.TechOrderLeadId
+            TechOrderLeadId = entity.TechOrderLeadId,
+            OrderItems = entity.OrderItems?
+            .Select(oi => new OrderItemDto
+            {
+                Id = oi.Id,
+                Product = ItemDto.FromEntity(oi.Product),
+                Quantity = oi.Quantity
+            }).ToList() ?? new()
         };
     }
     public OrderBase ToEntity()

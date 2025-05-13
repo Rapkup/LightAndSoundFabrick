@@ -1,4 +1,6 @@
-﻿namespace SemataryFabrick.Domain.Entities.Models;
+﻿using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
+
+namespace SemataryFabrick.Domain.Entities.Models;
 public class ProductCategory
 {
     public Guid Id { get; set; }

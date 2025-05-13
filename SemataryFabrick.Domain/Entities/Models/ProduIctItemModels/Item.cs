@@ -1,6 +1,7 @@
 ﻿using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.CartModels;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
+using SemataryFabrick.Domain.Entities.Models.ProduIctItemModels;
 
 namespace SemataryFabrick.Domain.Entities.Models.Items;
 public class Item
