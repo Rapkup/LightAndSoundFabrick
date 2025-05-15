@@ -1,0 +1,60 @@
+﻿@model TechLeadModel
+
+<div class="modal fade" id="manageTasksModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Управление задачами</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="AddTask">
+                    <input type="hidden" asp-for="SelectedCrewId" />
+                    <div class="input-group mb-3">
+                        <input type="text" name="taskDescription"
+                               class="form-control"
+                               placeholder="Новая задача">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-plus me-1"></i>Добавить
+                        </button>
+                    </div>
+                </form>
+
+                <div class="task-list">
+                    @{
+                        var crew = Model.ActiveOrders
+                        .SelectMany(o => o.OrderCrews)
+                        .FirstOrDefault(c => c.Id == Model.SelectedCrewId);
+                    }
+                    @if (crew?.WorkTaskAssignments != null)
+                    {
+                        foreach (var task in crew.WorkTaskAssignments)
+                        {
+                            <div class="card mb-2 @(task.IsCompleted ? "completed" : "")">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="form-check me-3">
+                                        <form method="post" asp-page-handler="ToggleTask">
+                                            <input type="hidden" name="taskId" value="@task.Id" />
+                                            <input class="form-check-input" type="checkbox"
+                                            @(task.IsCompleted ? "checked" : "")
+                                                   onchange="this.form.submit()">
+                                        </form>
+                                    </div>
+                                    <div class="flex-grow-1 @(task.IsCompleted ? "text-muted text-decoration-line-through" : "")">
+                                        @task.WorkTask.Description
+                                    </div>
+                                    <form method="post" asp-page-handler="DeleteTask">
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

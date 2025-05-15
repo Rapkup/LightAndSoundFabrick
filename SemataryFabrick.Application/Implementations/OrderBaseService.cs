@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SemataryFabrick.Application.Contracts.Services;
 using SemataryFabrick.Application.Entities.DTOs.OrderDtos;
+using SemataryFabrick.Application.Entities.Exceptions;
 using SemataryFabrick.Domain.Contracts.Repositories;
 using SemataryFabrick.Domain.Entities.Enums;
 using SemataryFabrick.Domain.Entities.Models.OrderModels;
@@ -121,5 +122,15 @@ public class OrderBaseService(IRepositoryManager repositoryManager, ILogger<Cart
             CompletedTasks = await repositoryManager.OrderBase.GetCompletedTasksCountAsync(orderId),
             TotalTasks = await repositoryManager.OrderBase.GetTotalTasksCountAsync(orderId)
         };
+    }
+
+
+    public async Task UpdateOrderStatusAsync(Guid orderId, OrderState newState)
+    {
+        var order = await repositoryManager.OrderBase.GetOrderBaseAsync(orderId);
+        if (order == null) throw new EntityNotFoundException(nameof(OrderBase), orderId);
+
+        order.OrderState = newState;
+        await repositoryManager.SaveAsync();
     }
 }

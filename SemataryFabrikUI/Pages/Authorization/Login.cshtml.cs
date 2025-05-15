@@ -49,7 +49,7 @@ namespace SemataryFabrikUI.Pages.Authorization
                             return RedirectToPage("/Dashboard/OrderManager");
 
                         case UserType.TechOrderLead:
-                            return RedirectToPage("/Dashboard/TechOrderLead");
+                            return RedirectToPage("/Dashboard/TechLead");
 
                         case UserType.Worker:
                             return RedirectToPage("/Dashboard/Worker");

@@ -1,10 +1,13 @@
 using SemataryFabrick.Application.Extensions;
 using SemataryFabrick.Infrastructure.Extensions;
+using SemataryFabrick.Infrastructure.Extensions.InMemoryDb;
 using SemataryFabrickUI.Middleware.CustomExceptionHandle;
 using SemataryFabrikUI.Pages.Components.CartBadge;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<InMemoryDatabase>();
+builder.Services.AddHostedService<DatabaseInitializerHostedService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartBadgeViewComponent>();

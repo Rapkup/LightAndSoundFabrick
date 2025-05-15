@@ -10,6 +10,6 @@ public class OrderCrew
 
     public TechOrderLead TechOrderLead { get; set; }
     public OrderBase OrderBase { get; set; }
-    public IEnumerable<Worker> Workers { get; set; }
-    public IEnumerable<WorkTaskAssignment> WorkTaskAssignments { get; set; }
+    public ICollection<Worker> Workers { get; set; }
+    public ICollection<WorkTaskAssignment> WorkTaskAssignments { get; set; }
 }

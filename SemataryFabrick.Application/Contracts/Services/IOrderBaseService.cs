@@ -17,5 +17,6 @@ public interface IOrderBaseService
     Task AddOrderItemAsync(Guid orderId, Guid productId, int quantity);
     Task<OrderBaseDto> GetOrderWithItemsAsync(Guid orderId);
     Task<OrderProgressDto> GetOrderProgressAsync(Guid orderId);
+    Task UpdateOrderStatusAsync(Guid orderId, OrderState newState);
 
 }

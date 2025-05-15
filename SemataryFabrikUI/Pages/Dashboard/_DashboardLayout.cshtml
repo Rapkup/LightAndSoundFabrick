@@ -83,78 +83,6 @@
     <!-- [ Header Topbar ] start --    <header class="pc-header">
     <header class="pc-header">
 
-                <!-- [Mobile Media Block] start -->
-    <!-- [Mobile Media Block end] -->
-    <div class="ms-auto">
-        <ul class="list-unstyled">
-
-            <li class="dropdown pc-h-item header-user-profile">
-                <a class="pc-head-link dropdown-toggle arrow-none me-0" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" data-bs-auto-close="outside" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </a>
-                <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown p-0 overflow-hidden">
-                    <div class="dropdown-header d-flex align-items-center justify-content-between bg-primary">
-                        <div class="d-flex my-2">
-                            <div class="flex-shrink-0">
-                                <img src="/dashboard-template/assets/images/user/avatar-2.td0sme8t5n.jpg" alt="user-image" class="user-avtar wid-35">
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="text-white mb-1">Carson Darrin 🖖</h6>
-                                <span class="text-white text-opacity-75">carson.darrin@company.io</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dropdown-body">
-                        <div class="profile-notification-scroll position-relative" style="max-height: calc(100vh - 225px)" data-simplebar="init">
-                            <div class="simplebar-wrapper" style="margin: 0px;">
-                                <div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask">
-                                    <div class="simplebar-offset" style="right: 0px; bottom: 0px;">
-                                        <div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: auto; overflow: hidden;">
-                                            <div class="simplebar-content" style="padding: 0px;">
-                                                <a href="#" class="dropdown-item">
-                                                    <span>
-                                                        <svg class="pc-icon text-muted me-2">
-                                                            <use xlink:href="#custom-setting-outline"></use>
-                                                        </svg>
-                                                        <span>Settings</span>
-                                                    </span>
-                                                </a>
-                                                <a href="#" class="dropdown-item">
-                                                    <span>
-                                                        <svg class="pc-icon text-muted me-2">
-                                                            <use xlink:href="#custom-share-bold"></use>
-                                                        </svg>
-                                                        <span>Share</span>
-                                                    </span>
-                                                </a>
-                                                <a href="#" class="dropdown-item">
-                                                    <span>
-                                                        <svg class="pc-icon text-muted me-2">
-                                                            <use xlink:href="#custom-lock-outline"></use>
-                                                        </svg>
-                                                        <span>Change Password</span>
-                                                    </span>
-                                                </a>
-                                                <div class="d-grid my-2">
-                                                    <button class="btn btn-primary">
-                                                        <svg class="pc-icon me-2">
-                                                            <use xlink:href="#custom-logout-1-outline"></use>
-                                                        </svg>Logout
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div><div class="simplebar-placeholder" style="width: 0px; height: 0px;"></div>
-                            </div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: hidden;"><div class="simplebar-scrollbar" style="height: 0px; display: none;"></div></div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
-    </header>
     <!-- [ Header ] end -->
     @RenderBody()
 
@@ -162,11 +90,13 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col my-1">
-                    <p class="m-0">Datta able &#9829; crafted by Team <a href="https://codedthemes.com/" target="_blank">Codedthemes</a></p>
                 </div>
                 <div class="col-auto my-1">
                     <ul class="list-inline footer-link mb-0">
-                        <li class="list-inline-item"><a href="../index.html">Home</a></li>
+                        <form class="d-inline" asp-page="../Authorization/Logout" method="post">
+                            <button type="submit" class="btn btn-primary">Выйти</button>
+                        </form>
+                       
                     </ul>
                 </div>
             </div>

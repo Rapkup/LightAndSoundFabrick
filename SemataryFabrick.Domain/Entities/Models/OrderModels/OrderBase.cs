@@ -22,5 +22,5 @@ public class OrderBase
     public OrderManager OrderManager { get; set; }
     public TechOrderLead TechOrderLead { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    public ICollection<OrderCrew> OrderCrews { get; set; }
+    public ICollection<OrderCrew> OrderCrews { get; set; } = new List<OrderCrew>();
 }

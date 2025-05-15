@@ -37,12 +37,13 @@ public class OrderBaseRepository(ApplicationContext context) : RepositoryBase<Or
             .Where(o => o.OrderManagerId == managerId)
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
+                .ThenInclude(p => p.SubCategory)
             .Include(o => o.OrderCrews)
             .AsNoTracking()
             .ToListAsync();
     }
 
-      public async Task<OrderBase?> GetOrderWithCrewsAndTasksAsync(Guid id)
+    public async Task<OrderBase?> GetOrderWithCrewsAndTasksAsync(Guid id)
     {
         return await context.Orders
             .Where(o => o.Id == id)
@@ -65,13 +66,13 @@ public class OrderBaseRepository(ApplicationContext context) : RepositoryBase<Or
         {
             // Обновление основных полей
             context.Entry(existingOrder).CurrentValues.SetValues(order);
-            
+
             // Обработка элементов заказа
             foreach (var item in order.OrderItems)
             {
                 var existingItem = existingOrder.OrderItems
                     .FirstOrDefault(i => i.Id == item.Id);
-                
+
                 if (existingItem != null)
                 {
                     // Обновление существующего элемента
@@ -137,11 +138,16 @@ public class OrderBaseRepository(ApplicationContext context) : RepositoryBase<Or
     public async Task<IEnumerable<OrderBase>> GetOrdersByStatusAsync(OrderState state)
     {
         return await context.Orders
-            .Where(o => o.OrderState == state)
-            .Include(o => o.OrderItems)
+        .Where(o => o.OrderState == state)
+        .Include(o => o.OrderCrews)
+            .ThenInclude(oc => oc.Workers)
+        .Include(o => o.OrderCrews)
+            .ThenInclude(oc => oc.WorkTaskAssignments)
+                .ThenInclude(wta => wta.WorkTask)
+        .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Product)
-            .AsNoTracking()
-            .ToListAsync();
+        .AsNoTracking()
+        .ToListAsync();
     }
 
     public async Task<int> GetCompletedTasksCountAsync(Guid orderId)

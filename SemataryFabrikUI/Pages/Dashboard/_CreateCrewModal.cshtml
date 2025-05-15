@@ -1,0 +1,66 @@
+﻿@model TechLeadModel
+
+<div class="modal fade" id="createCrewModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Создание новой команды</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="AddCrew">
+                <input type="hidden" asp-for="SelectedOrderId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Дата работы</label>
+                        <input type="date" class="form-control" asp-for="NewCrewWorkDate" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Выберите участников:</h6>
+                        <div class="row row-cols-1 row-cols-md-3 g-2">
+                            @foreach (var worker in Model.GetAllWorkers())
+                            {
+                                <div class="col">
+                                    <div class="card worker-card">
+                                        <div class="card-body d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="fw-bold">@worker.FirstName @worker.LastName</span><br>
+                                                <small class="text-muted">@worker.UserName</small>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="SelectedWorkers"
+                                                       value="@worker.Id" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Создать команду</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .worker-card {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .worker-card:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .worker-card .form-check-input {
+            transform: scale(1.2);
+        }
+</style>

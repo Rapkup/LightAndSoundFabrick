@@ -1,0 +1,153 @@
+﻿@using SemataryFabrick.Domain.Entities.Models
+@using SemataryFabrick.Domain.Entities.Models.OrderModels
+@model TechLeadModel
+
+<div class="modal fade" id="manageCrewModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Управление командами</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="AddCrew">
+                    <input type="hidden" asp-for="SelectedOrderId" />
+                    <div class="mb-3">
+                        <button type="button"
+                                class="btn btn-success"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createCrewModal">
+                            <i class="ti ti-plus me-1"></i>Добавить команду
+                        </button>
+                    </div>
+                </form>
+
+
+                @{
+                    var order = Model.ActiveOrders.FirstOrDefault(o => o.Id == Model.SelectedOrderId);
+                    var crews = order?.OrderCrews ?? new List<OrderCrew>();
+                }
+
+                @foreach (var crew in crews)
+                {
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex flex-column">
+                                    <h6 class="mb-0">Команда от @crew.WorkDate.ToShortDateString()</h6>
+                                    <small class="text-muted">ID: @crew.Id.ToString().Substring(0, 8)</small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <form method="post" class="d-inline">
+                                        <input type="hidden" name="crewId" value="@crew.Id" />
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editCrewModal"
+                                                onclick="loadCrewDetails('@crew.Id')">
+                                            <i class="ti ti-edit"></i>
+                                        </button>
+                                    </form>
+                                    <button class="btn btn-sm btn-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#manageTasksModal"
+                                            onclick="setSelectedCrew('@crew.Id')">
+                                        <i class="ti ti-list-details me-1"></i>Задачи
+                                    </button>
+                                    <button class="btn btn-sm btn-info"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#manageWorkersModal"
+                                            onclick="setSelectedCrew('@crew.Id')">
+                                        <i class="ti ti-user-plus me-1"></i>Работники
+                                    </button>
+                                    <form method="post" asp-page-handler="RemoveCrew">
+                                        <input type="hidden" name="crewId" value="@crew.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Работники:</h6>
+                                    <div class="workers-list">
+                                        @foreach (var worker in Model.GetWorkersForCrew(crew.Id))
+                                        {
+                                            <span class="badge bg-primary me-1 mb-1">
+                                                @worker.FirstName @worker.LastName
+                                            </span>
+                                        }
+                                        @if (!Model.GetWorkersForCrew(crew.Id).Any())
+                                        {
+                                            <div class="text-muted">Нет назначенных работников</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Задачи:</h6>
+                                    <div class="tasks-list">
+                                        @foreach (var task in crew.WorkTaskAssignments ?? new List<WorkTaskAssignment>())
+                                        {
+                                            <div class="d-flex align-items-center mb-1">
+                                                <span class="@(task.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                                                    @task.WorkTask.Description
+                                                </span>
+                                                <span class="badge @(task.IsCompleted ? "bg-success" : "bg-warning") ms-2">
+                                                    @(task.IsCompleted ? "Выполнено" : "В работе")
+                                                </span>
+                                            </div>
+                                        }
+                                        @if (!crew.WorkTaskAssignments?.Any() == true)
+                                        {
+                                            <div class="text-muted">Нет созданных задач</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_CreateCrewModal", Model)
+
+<!-- Модальное окно редактирования команды -->
+<div class="modal fade" id="editCrewModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактирование команды</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="UpdateCrew">
+                <div class="modal-body">
+                    <input type="hidden" id="editCrewId" name="crewId" />
+                    <div class="mb-3">
+                        <label class="form-label">Дата работы</label>
+                        <input type="date" class="form-control" name="workDate" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function loadCrewDetails(crewId) {
+        fetch(`?handler=CrewDetails&crewId=${crewId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editCrewId').value = crewId;
+                document.querySelector('#editCrewModal input[name="workDate"]').value =
+                    new Date(data.workDate).toISOString().split('T')[0];
+            });
+    }
+</script>

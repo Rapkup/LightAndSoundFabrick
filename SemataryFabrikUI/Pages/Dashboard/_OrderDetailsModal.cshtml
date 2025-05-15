@@ -1,0 +1,46 @@
+﻿@using SemataryFabrick.Domain.Entities.Models.OrderModels
+@model OrderBase
+
+<div class="modal fade" id="orderDetailsModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Детали заказа</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID:</dt>
+                    <dd class="col-sm-9">@Model.Id</dd>
+
+                    <dt class="col-sm-3">Адрес:</dt>
+                    <dd class="col-sm-9">@Model.EventAddress</dd>
+
+                    <dt class="col-sm-3">Статус:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-primary">@Model.OrderState</span>
+                    </dd>
+
+                    <dt class="col-sm-3">Тип:</dt>
+                    <dd class="col-sm-9">@Model.OrderType</dd>
+
+                    <dt class="col-sm-3">Сумма:</dt>
+                    <dd class="col-sm-9">@Model.TotalPrice.ToString("C")</dd>
+
+                    @if (Model.OrderItems?.Count > 0)
+                    {
+                        <dt class="col-sm-3">Оборудование:</dt>
+                        <dd class="col-sm-9">
+                            <ul class="list-unstyled">
+                                @foreach (var item in Model.OrderItems)
+                                {
+                                    <li>@item.Product.Name - @item.Quantity шт.</li>
+                                }
+                            </ul>
+                        </dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

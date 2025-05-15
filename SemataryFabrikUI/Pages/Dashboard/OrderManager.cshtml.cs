@@ -1,249 +1,324 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SemataryFabrick.Application.Contracts.Services;
-using SemataryFabrick.Application.Entities.DTOs;
-using SemataryFabrick.Application.Entities.DTOs.OrderDtos;
-using SemataryFabrick.Application.Entities.DTOs.ProductItemDtos;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SemataryFabrick.Domain.Entities.Enums;
+using SemataryFabrick.Domain.Entities.Models;
+using SemataryFabrick.Domain.Entities.Models.OrderModels;
+using SemataryFabrick.Domain.Entities.Models.UserModels;
+using SemataryFabrick.Infrastructure.Extensions.InMemoryDb;
 using System.ComponentModel.DataAnnotations;
 
-namespace SemataryFabrikUI.Pages.Dashboard
+namespace SemataryFabrikUI.Pages.Dashboard;
+
+[BindProperties]
+public class OrderMangerModel : PageModel
 {
-    public class OrderMangerModel : PageModel
+    public readonly InMemoryDatabase _db;
+
+    public OrderMangerModel(InMemoryDatabase db)
     {
-        private readonly IOrderBaseService _orderService;
-        public readonly IUserService _userService;
-        private readonly IItemService _itemService;
-        public readonly IWorkTaskService _workTaskService;
-        private readonly IProductCategoryService _productCategoryService;
-        private readonly ISubCategoryService _subCategoryService;
+        _db = db;
+    }
 
-        public OrderMangerModel(
-            IOrderBaseService orderService,
-            IUserService userService,
-            IItemService itemService,
-            IWorkTaskService workTaskService,
-            IProductCategoryService productCategoryService,
-            ISubCategoryService subCategoryService)
+    // Properties for order operations
+    [BindProperty] public Guid SelectedTechLeadId { get; set; }
+    [BindProperty] public decimal NewTotalPrice { get; set; }
+    [BindProperty] public Guid SelectedOrderId { get; set; }
+
+    // Properties for item management
+    [BindProperty] public Guid SelectedCategoryId { get; set; }
+    [BindProperty] public Guid SelectedSubCategoryId { get; set; }
+    [BindProperty] public Guid SelectedItemId { get; set; }
+    [BindProperty][Range(1, 100)] public int Quantity { get; set; } = 1;
+
+    // Data collections
+    public List<SelectListItem> TechLeads { get; set; } = new();
+    public List<OrderBase> NewOrders { get; set; } = new();
+    public List<OrderBase> InProgressOrders { get; set; } = new();
+    public List<OrderBase> PaymentConfirmationOrders { get; set; } = new();
+    public List<OrderBase> RentOrders { get; set; } = new();
+
+    public void OnGet()
+    {
+        LoadOrders();
+        InitializeTechLeads();
+    }
+
+    private void LoadOrders()
+    {
+        var currentUserId = GetCurrentOrderManagerId();
+
+        NewOrders = _db.Orders
+            .Where(o => o.OrderState == OrderState.Stock
+            && o.OrderManagerId == currentUserId)
+            .Select(o => MapOrderWithRelatedData(o))
+            .ToList();
+
+        InProgressOrders = _db.Orders
+            .Where(o => o.OrderState is OrderState.ApprovedByManager
+                or OrderState.ProccessedByTechLead
+                 && o.OrderManagerId == currentUserId)
+              .Select(o => MapOrderWithRelatedData(o))
+            .ToList();
+
+        PaymentConfirmationOrders = _db.Orders
+            .Where(o => o.PaymentState == PaymentStatus.PaymentConfirmation
+             && o.OrderManagerId == currentUserId)
+              .Select(o => MapOrderWithRelatedData(o))
+            .ToList();
+
+        RentOrders = _db.Orders
+            .Where(o => o.OrderType == OrderType.Rent
+             && o.OrderManagerId == currentUserId)
+              .Select(o => MapOrderWithRelatedData(o))
+            .ToList();
+    }
+
+    private OrderBase MapOrderWithRelatedData(OrderBase order)
+    {
+        // Загрузка базовых данных пользователей
+        order.Customer = _db.Users
+            .FirstOrDefault(u => u.Id == order.CustomerId);
+
+        order.OrderManager = _db.Users
+            .OfType<OrderManager>()
+            .FirstOrDefault(om => om.Id == order.OrderManagerId);
+
+        order.TechOrderLead = _db.Users
+            .OfType<TechOrderLead>()
+            .FirstOrDefault(t => t.Id == order.TechOrderLeadId);
+
+        // Загрузка элементов заказа с продуктами и скидками
+        order.OrderItems = _db.OrderItems
+            .Where(oi => oi.OrderBaseId == order.Id)
+            .Select(oi => new OrderItem
+            {
+                Id = oi.Id,
+                OrderBaseId = oi.OrderBaseId,
+                ProductId = oi.ProductId,
+                Quantity = oi.Quantity,
+                DiscountId = oi.DiscountId,
+                Product = _db.Items
+                    .Find(i => i.Id == oi.ProductId),
+                Discount = _db.Discounts
+                    .FirstOrDefault(d => d.Id == oi.DiscountId)
+            }).ToList();
+
+        // Загрузка команд с полной иерархией
+        order.OrderCrews = _db.OrderCrews
+            .Where(oc => oc.OrderBaseId == order.Id)
+            .Select(oc => new OrderCrew
+            {
+                Id = oc.Id,
+                OrderBaseId = oc.OrderBaseId,
+                TechLeadId = oc.TechLeadId,
+                WorkDate = oc.WorkDate,
+                TechOrderLead = _db.Users
+                    .OfType<TechOrderLead>()
+                    .FirstOrDefault(t => t.Id == oc.TechLeadId),
+                WorkTaskAssignments = _db.WorkTaskAssignments
+                    .Where(wta => wta.OrderCrewId == oc.Id)
+                    .Select(wta => new WorkTaskAssignment
+                    {
+                        Id = wta.Id,
+                        OrderCrewId = wta.OrderCrewId,
+                        WorkTaskId = wta.WorkTaskId,
+                        IsCompleted = wta.IsCompleted,
+                        WorkTask = _db.WorkTasks
+                            .FirstOrDefault(wt => wt.Id == wta.WorkTaskId)
+                    }).ToList(),
+                Workers = _db.WorkerCrewRelations
+                    .Where(r => r.CrewId == oc.Id)
+                    .Join(_db.Users.OfType<Worker>(),
+                        relation => relation.WorkerId,
+                        worker => worker.Id,
+                        (relation, worker) => worker)
+                    .ToList()
+            }).ToList();
+
+
+        return order;
+    }
+    private Guid GetCurrentOrderManagerId()
+    {
+        var username = HttpContext.Session.GetString("Username");
+
+        return _db.Users.OfType<OrderManager>().First(u => u.UserName == username).Id;
+    }
+
+    private void InitializeTechLeads()
+    {
+        TechLeads = _db.Users
+            .OfType<TechOrderLead>()
+            .Select(t => new SelectListItem(
+                $"{t.FirstName} {t.LastName}",
+                t.Id.ToString()))
+            .ToList();
+    }
+
+    #region Order Actions
+    public IActionResult OnPostApproveOrder(Guid id)
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == id);
+        if (order != null)
         {
-            _orderService = orderService;
-            _userService = userService;
-            _itemService = itemService;
-            _workTaskService = workTaskService;
-            _productCategoryService = productCategoryService;
-            _subCategoryService = subCategoryService;
+            order.OrderState = OrderState.ApprovedByManager;
         }
+        return RedirectToPage();
+    }
 
-        // Свойства для отображения заказов
-        public List<OrderBaseDto> NewOrders { get; set; } = new();
-        public List<OrderBaseDto> InProgressOrders { get; set; } = new();
-        public List<OrderBaseDto> PendingPaymentOrders { get; set; } = new();
-        public List<OrderBaseDto> RentOrders { get; set; } = new();
-
-        // Модели привязки
-        [BindProperty]
-        public UpdateOrderModel UpdateModel { get; set; } = new();
-
-        [BindProperty]
-        public Guid ConfirmOrderId { get; set; }
-
-        [BindProperty]
-        public Guid DenyOrderId { get; set; }
-
-        [BindProperty]
-        public EditItemModel EditItemModel { get; set; } = new();
-
-        [BindProperty]
-        public AddItemToOrderModel AddItemModel { get; set; } = new();
-
-        // Данные для каскадных выпадающих списков
-        public List<ProductCategoryDto> Categories { get; set; } = new();
-        public Dictionary<Guid, List<SubCategoryDto>> Subcategories { get; set; } = new();
-        public Dictionary<Guid, List<ItemDto>> Products { get; set; } = new();
-
-        // Методы обработки запросов
-        public async Task<IActionResult> OnPostDenyOrderAsync()
+    public IActionResult OnPostRejectOrder(Guid id)
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == id);
+        if (order != null)
         {
-            var order = await _orderService.GetOrderByIdAsync(DenyOrderId);
             order.OrderState = OrderState.Denied;
-            await _orderService.UpdateOrderAsync(order);
-            return RedirectToPage();
         }
+        return RedirectToPage();
+    }
 
-        public async Task<IActionResult> OnPostUpdateItemAsync()
+    public IActionResult OnPostProcessOrder(Guid id)
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == id);
+        if (order != null)
         {
-            if (!ModelState.IsValid)
-                return Page();
-
-            await _orderService.UpdateOrderItemAsync(EditItemModel.OrderItemId, EditItemModel.Quantity);
-            return RedirectToPage();
+            order.OrderState = OrderState.Done;
+            order.PaymentState = PaymentStatus.PaymentConfirmation;
         }
+        return RedirectToPage();
+    }
 
-        public async Task<IActionResult> OnPostRemoveItemAsync(Guid orderItemId)
+    public IActionResult OnPostConfirmPayment(Guid id)
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == id);
+        if (order != null)
         {
-            await _orderService.RemoveOrderItemAsync(orderItemId);
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnPostAddItemAsync()
-        {
-            if (!ModelState.IsValid)
-                return Page();
-
-            await _orderService.AddOrderItemAsync(
-                AddItemModel.OrderId,
-                AddItemModel.ProductId,
-                AddItemModel.Quantity);
-
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnGetAsync()
-        {
-            if (!IsAuthorized())
-                return RedirectToPage("/Login");
-
-            var managerId = Guid.Parse(HttpContext.Session.GetString("UserId"));
-            var allOrders = (await _orderService.GetOrdersByManagerWithItemsAsync(managerId)).ToList();
-
-            // Разделение заказов по состояниям
-            NewOrders = allOrders
-                .Where(o => o.OrderState == OrderState.Stock)
-                .Select(OrderBaseDto.FromEntity)
-                .ToList();
-
-            InProgressOrders = allOrders
-                .Where(o => o.OrderState is OrderState.ApprovedByManager or OrderState.ProccessedByTechLead)
-                .Select(OrderBaseDto.FromEntity)
-                .ToList();
-
-            PendingPaymentOrders = allOrders
-                .Where(o => o.PaymentState == PaymentStatus.PaymentConfirmation)
-                .Select(OrderBaseDto.FromEntity)
-                .ToList();
-
-            RentOrders = allOrders
-                .Where(o => o.OrderType == OrderType.Rent)
-                .Select(OrderBaseDto.FromEntity)
-                .ToList();
-
-            // Загрузка данных для каскадных списков
-            await LoadCategoryData();
-
-            return Page();
-        }
-
-        private async Task LoadCategoryData()
-        {
-            Categories = (await _productCategoryService.GetAllProductCategoriesAsync()).ToList();
-
-            foreach (var category in Categories)
-            {
-                var subcategories = await _subCategoryService.GetSubCategoriesByParentIdAsync(category.Id);
-                Subcategories[category.Id] = subcategories.ToList();
-
-                foreach (var subcategory in subcategories)
-                {
-                    var products = await _itemService.GetItemsBySubCategoriesAsync([subcategory.Id]);
-                    Products[subcategory.Id] = products.ToList();
-                }
-            }
-        }
-
-        public async Task<IActionResult> OnPostUpdateOrderAsync()
-        {
-            if (!ModelState.IsValid)
-                return Page();
-
-            var order = await _orderService.GetOrderByIdAsync(UpdateModel.OrderId);
-            if (order == null)
-            {
-                ModelState.AddModelError("", "Order not found");
-                return Page();
-            }
-
-            order.TechOrderLeadId = UpdateModel.TechLeadId;
-            order.TotalPrice = UpdateModel.TotalPrice;
-            await _orderService.UpdateOrderAsync(order);
-
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnPostConfirmPaymentAsync()
-        {
-            var order = await _orderService.GetOrderByIdAsync(ConfirmOrderId);
-            if (order == null)
-            {
-                ModelState.AddModelError("", "Order not found");
-                return Page();
-            }
-
             order.PaymentState = PaymentStatus.Paid;
-            await _orderService.UpdateOrderAsync(order);
+        }
+        return RedirectToPage();
+    }
+    #endregion
 
-            return RedirectToPage();
+    #region Tech Lead & Price Updates
+    public IActionResult OnPostUpdateTechLead()
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == SelectedOrderId);
+        if (order != null)
+        {
+            order.TechOrderLeadId = SelectedTechLeadId;
+          
+        }
+        return RedirectToPage();
+    }
+
+    public IActionResult OnPostUpdatePrice()
+    {
+        var order = _db.Orders.FirstOrDefault(o => o.Id == SelectedOrderId);
+        if (order != null)
+        {
+            order.TotalPrice = NewTotalPrice;
+        }
+        return RedirectToPage();
+    }
+    #endregion
+
+    #region Item Management
+    public JsonResult OnGetSubCategories(Guid categoryId)
+    {
+        var subCategories = _db.SubCategories
+            .Where(sc => sc.ParentCategoryId == categoryId)
+            .Select(sc => new { sc.Id, sc.Name })
+            .ToList();
+        return new JsonResult(subCategories);
+    }
+
+    public JsonResult OnGetItems(Guid subCategoryId)
+    {
+        var items = _db.Items
+            .Where(i => i.SubCategoryId == subCategoryId)
+            .Select(i => new { i.Id, i.Name, Price = i.Price.ToString("C") })
+            .ToList();
+        return new JsonResult(items);
+    }
+
+    public JsonResult OnGetOrderItems(Guid orderId)
+    {
+        var order = _db.Orders
+            .FirstOrDefault(o => o.Id == orderId);
+
+        if (order == null) return new JsonResult(new { });
+
+        var items = order.OrderItems.Select(oi => new
+        {
+            id = oi.Id,
+            productName = oi.Product?.Name ?? "N/A",
+            price = oi.Product?.Price.ToString("C") ?? "N/A",
+            quantity = oi.Quantity,
+            total = (oi.Quantity * (oi.Product?.Price ?? 0)).ToString("C")
+        });
+
+        return new JsonResult(items);
+    }
+
+    public IActionResult OnPostAddItem()
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
         }
 
-        private bool IsAuthorized()
+        var order = _db.Orders.FirstOrDefault(o => o.Id == SelectedOrderId);
+        var item = _db.Items.FirstOrDefault(i => i.Id == SelectedItemId);
+
+        if (order == null || item == null)
         {
-            return HttpContext.Session.GetString("UserType") == UserType.OrderManager.ToString();
+            return NotFound();
         }
 
-        // Вспомогательные методы для отображения статусов аренды
-        public string GetRentStatus(OrderBaseDto order)
-        {
-            if (order.PaymentState == PaymentStatus.PaymentConfirmation)
-                return "Pending Confirmation";
-            
-            if (DateTime.Now > order.EndRentDate?.ToDateTime(TimeOnly.MinValue))
-                return "Overdue";
-            
-            return order.PaymentState.ToString();
-        }
+        var existingItem = order.OrderItems.FirstOrDefault(oi => oi.ProductId == SelectedItemId);
 
-        public string GetRentStatusBadge(OrderBaseDto order)
+        if (existingItem != null)
         {
-            return GetRentStatus(order) switch
+            existingItem.Quantity += Quantity;
+        }
+        else
+        {
+            var newOrderItem = new OrderItem
             {
-                "Overdue" => "bg-danger",
-                "Pending Confirmation" => "bg-warning",
-                "Paid" => "bg-success",
-                _ => "bg-secondary"
+                Id = Guid.NewGuid(),
+                ProductId = SelectedItemId,
+                Quantity = Quantity,
+                OrderBaseId = order.Id 
             };
+
+            order.OrderItems.Add(newOrderItem);
+            _db.OrderItems.Add(newOrderItem); 
         }
+
+        order.TotalPrice = CalculateOrderTotal(order);
+        return RedirectToPage();
     }
 
-    // Модели для привязки данных
-    public class UpdateOrderModel
+    public IActionResult OnPostRemoveItem(Guid itemId, Guid orderId)
     {
-        [Required]
-        public Guid OrderId { get; set; }
+        var order = _db.Orders.FirstOrDefault(o => o.Id == orderId);
+        if (order == null) return NotFound();
 
-        [Required]
-        [Display(Name = "Technical Lead")]
-        public Guid TechLeadId { get; set; }
+        var item = order.OrderItems.FirstOrDefault(oi => oi.Id == itemId);
+        if (item != null)
+        {
+            order.OrderItems.Remove(item);
+            order.TotalPrice = CalculateOrderTotal(order);
+        }
 
-        [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Price must be positive")]
-        [Display(Name = "Total Price")]
-        public decimal TotalPrice { get; set; }
+        return RedirectToPage();
     }
 
-    public class EditItemModel
+
+    private decimal CalculateOrderTotal(OrderBase order)
     {
-        public Guid OrderItemId { get; set; }
-
-        [Range(1, 100)]
-        public int Quantity { get; set; }
+        return order.OrderItems.Sum(oi =>
+            _db.Items.First(i => i.Id == oi.ProductId).Price * oi.Quantity);
     }
-
-    public class AddItemToOrderModel
-    {
-        public Guid OrderId { get; set; }
-
-        public Guid ProductId { get; set; }
-
-        [Range(1, 100)]
-        public int Quantity { get; set; } = 1;
-    }
+    #endregion
 }

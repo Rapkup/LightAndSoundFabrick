@@ -9,4 +9,5 @@ public interface IUserRepository
     Task<ApplicationUser?> GetRandomByTypeAsync(UserType userType);
     Task<ApplicationUser> GetUserAsync(Guid id);
     Task<IEnumerable<ApplicationUser>?> GetUsersByUserTypeAsync(UserType userType);
+    Task<IEnumerable<ApplicationUser>?> GetUsersByIdsAsync(IEnumerable<Guid> ids);
 }
